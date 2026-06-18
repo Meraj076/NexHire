@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: nexhire-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: webapplication
+      MYSQL_ROOT_PASSWORD: Meraj@12345
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pMeraj@12345"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ../webapplication
+      dockerfile: Dockerfile
+    container_name: nexhire-backend
+    restart: always
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/webapplication?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Meraj@12345
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nexhire-frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

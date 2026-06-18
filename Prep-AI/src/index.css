@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-base: var(--theme-bg-base);
+  --color-bg-panel: var(--theme-bg-panel);
+  --color-bg-card: var(--theme-bg-card);
+  --color-text-main: var(--theme-text-main);
+  --color-text-muted: var(--theme-text-muted);
+  --color-border: var(--theme-border);
+}
+
+:root {
+  /* Dark Theme (Default) */
+  --theme-bg-base: #080a0a;
+  --theme-bg-panel: #121414;
+  --theme-bg-card: #0a0a0a;
+  --theme-text-main: #e2e2e2;
+  --theme-text-muted: #889290;
+  --theme-border: #1e2020;
+}
+
+/* Removed Light Theme */
+
+/* Custom utility for glass panels to adapt */
+.glass-panel {
+  background-color: var(--theme-bg-panel);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}

@@ -1,5 +1,5 @@
 # Build Stage
-FROM openjdk:17-jdk-slim AS build
+FROM eclipse-temurin:17-jdk-jammy AS build
 WORKDIR /app
 
 # Copy Maven wrapper and Project Object Model (POM)
@@ -19,7 +19,7 @@ COPY src ./src
 RUN ./mvnw package -DskipTests
 
 # Run Stage
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
 # Copy the built artifact from the build stage

@@ -1,0 +1,68 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // 🎯 NEXHIRE PREMIUM THEME COLORS 
+        "surface": "#121414",
+        "on-tertiary-container": "#626161",
+        "tertiary-fixed": "#e5e2e1",
+        "primary": "#f0ffed",
+        "on-primary-container": "#007135",
+        "primary-fixed-dim": "#00e472",
+        "on-tertiary-fixed-variant": "#474746",
+        "on-secondary-fixed-variant": "#474646",
+        "surface-container-lowest": "#0c0f0f",
+        "inverse-primary": "#006d33",
+        "surface-container-low": "#1a1c1c",
+        "on-tertiary-fixed": "#1c1b1b",
+        "on-surface": "#e2e2e2",
+        "surface-tint": "#00e472",
+        "surface-bright": "#38393a",
+        "surface-container-high": "#282a2b",
+        "surface-container": "#1e2020",
+        "on-surface-variant": "#b9cbb8",
+        "inverse-surface": "#e2e2e2",
+        "surface-variant": "#333535",
+        "on-error": "#690005",
+        "on-error-container": "#ffdad6",
+        "on-primary": "#003917",
+        "outline": "#849584",
+        "on-secondary-fixed": "#1c1b1b",
+        "tertiary-fixed-dim": "#c8c6c5",
+        "primary-container": "#00ff80",
+        "on-secondary-container": "#bab8b7",
+        "on-background": "#e2e2e2",
+        "on-primary-fixed-variant": "#005225",
+        "background": "#121414",
+        "tertiary": "#fdfaf9",
+        "error": "#ffb4ab",
+        "primary-fixed": "#63ff94",
+        "tertiary-container": "#e0dddd",
+        "on-tertiary": "#313030",
+        "on-primary-fixed": "#00210b",
+        "inverse-on-surface": "#2f3131",
+        "surface-dim": "#121414",
+        "surface-container-highest": "#333535",
+        "secondary-fixed-dim": "#c9c6c5",
+        "secondary-fixed": "#e5e2e1",
+        "error-container": "#93000a",
+        "secondary": "#c9c6c5",
+        "outline-variant": "#3b4b3c",
+        "secondary-container": "#4a4949",
+        "on-secondary": "#313030"
+      },
+      borderRadius: {
+        "DEFAULT": "1rem",
+        "lg": "2rem",
+        "xl": "3rem",
+        "full": "9999px"
+      }
+    },
+  },
+  plugins: [],
+}
