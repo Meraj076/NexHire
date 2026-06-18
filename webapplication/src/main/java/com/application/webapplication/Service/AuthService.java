@@ -36,6 +36,9 @@ public class AuthService {
         @Value("${application.security.google.client-id}")
         private String googleClientId;
 
+        @Value("${application.security.admin-emails:}")
+        private String adminEmails;
+
         // 1. Dependencies Declaration.
         private final UserRepo userRepo;
         private final PasswordEncoder passwordEncoder;
@@ -69,7 +72,7 @@ public class AuthService {
                                 .username(request.username())
                                 .email(request.email())
                                 .password(passwordEncoder.encode(request.password()))// Password Hashing
-                                .role(Role.USER)// Default role alllocated automatically.
+                                .role(determineRole(request.email()))// Determine role dynamically based on configured admin emails
                                 .build();
 
                 // Saving Entity into MySQL Database
@@ -180,7 +183,7 @@ public class AuthService {
                                                 .email(email)
                                                 .password(passwordEncoder.encode(
                                                                 "GOOGLE_AUTH_PROTECTED_" + UUID.randomUUID()))
-                                                .role(Role.USER)
+                                                .role(determineRole(email))// Determine role dynamically based on configured admin emails
                                                 .build();
                                 user = userRepo.save(user);
 
@@ -295,5 +298,16 @@ public class AuthService {
                 
                 userRepo.delete(user);
                 return "Account and history deleted successfully.";
+        }
+
+        private Role determineRole(String email) {
+                if (adminEmails != null && !adminEmails.trim().isEmpty()) {
+                        for (String adminEmail : adminEmails.split(",")) {
+                                if (adminEmail.trim().equalsIgnoreCase(email.trim())) {
+                                        return Role.ADMIN;
+                                }
+                        }
+                }
+                return Role.USER;
         }
 }
