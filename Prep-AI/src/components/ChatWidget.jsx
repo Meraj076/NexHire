@@ -1,74 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Sparkles, X, Send, Loader2, AlertCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import API from '../services/api';
 
-// ─── Gemini API Config ───────────────────────────────────────────────────────
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-// gemini-2.5-flash: Latest model
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-
-// ─── System Prompt (Bot ki personality) ────────────────────────────────────
-const SYSTEM_PROMPT = `You are PrepBot, an expert AI interview coach for Prep-AI platform.
-
-Your core specialties:
-- Mock technical interview practice (DSA, System Design, Frontend, Backend, Full Stack)
-- Resume review, ATS optimization, and bullet point improvements
-- Behavioral interview coaching using STAR method
-- Career advice for software engineers and developers
-- Interview tips, common mistakes, and best practices
-- Salary negotiation guidance
-
-Your personality:
-- Friendly, encouraging, and professional
-- Give concise but complete answers
-- Use bullet points and structured responses when helpful
-- If someone wants to practice, ask them questions and evaluate their answers
-- Always be supportive and motivating
-
-Important rules:
-- Stay focused on interview prep, career advice, and resume topics
-- If asked off-topic questions, gently redirect to interview/career topics
-- Keep responses clear and actionable
-- Use markdown formatting for better readability (bold, bullets, code blocks for code)`;
-
-// ─── Call Gemini API ─────────────────────────────────────────────────────────
+// ─── Call Secure Backend Chat Endpoint ──────────────────────────────────────
 async function callGemini(conversationHistory) {
-    const response = await fetch(GEMINI_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            system_instruction: {
-                parts: [{ text: SYSTEM_PROMPT }]
-            },
-            contents: conversationHistory,
-            generationConfig: {
-                temperature: 0.7,
-                topK: 40,
-                topP: 0.95,
-                maxOutputTokens: 1024,
-            }
-        })
-    });
-
-    if (!response.ok) {
-        const errData = await response.json();
-        const status = response.status;
-        const msg = errData?.error?.message || 'Gemini API error';
-
-        // Rate limit: extract retry time from message
-        if (status === 429) {
-            const retryMatch = msg.match(/(\d+(\.\d+)?)s/);
-            const seconds = retryMatch ? Math.ceil(parseFloat(retryMatch[1])) : 60;
-            throw new Error(`⏳ Rate limit reached. Please wait ${seconds} seconds and try again.`);
-        }
-        if (status === 400 && msg.includes('API_KEY')) {
-            throw new Error('❌ Invalid API Key. Please check your VITE_GEMINI_API_KEY in .env file.');
-        }
-        throw new Error(msg);
-    }
-
-    const data = await response.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I could not generate a response.';
+    const response = await API.post('/api/v1/chat', conversationHistory);
+    return response.data;
 }
 
 // ─── Typing Indicator Component ──────────────────────────────────────────────
@@ -131,12 +69,6 @@ export default function ChatWidget() {
         const trimmedInput = input.trim();
         if (!trimmedInput || isLoading) return;
 
-        // Check API key
-        if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
-            setError('Gemini API key not configured. Please add VITE_GEMINI_API_KEY to your .env file.');
-            return;
-        }
-
         setError(null);
 
         // Add user message
@@ -157,7 +89,8 @@ export default function ChatWidget() {
             ]);
         } catch (err) {
             console.error('Gemini error:', err);
-            setError(err.message || 'Something went wrong. Please try again.');
+            const errMsg = err.response?.data || err.message || 'Something went wrong. Please try again.';
+            setError(errMsg);
             // Remove the user message on error so they can retry
             setMessages(prev => prev.filter(m => m.id !== userMsg.id));
             setInput(trimmedInput);

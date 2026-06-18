@@ -82,6 +82,52 @@ public class GeminiAiService {
         return rawText;
     }
 
+    /** Calls Gemini API with conversation history and system instructions for chatbot. */
+    public String callGeminiWithHistory(List<Map<String, Object>> contents) throws Exception {
+        String apiUrl = GEMINI_API_URL + apiKey;
+
+        String systemPrompt = "You are PrepBot, an expert AI interview coach for Prep-AI platform.\n\n"
+                + "Your core specialties:\n"
+                + "- Mock technical interview practice (DSA, System Design, Frontend, Backend, Full Stack)\n"
+                + "- Resume review, ATS optimization, and bullet point improvements\n"
+                + "- Behavioral interview coaching using STAR method\n"
+                + "- Career advice for software engineers and developers\n"
+                + "- Interview tips, common mistakes, and best practices\n"
+                + "- Salary negotiation guidance\n\n"
+                + "Your personality:\n"
+                + "- Friendly, encouraging, and professional\n"
+                + "- Give concise but complete answers\n"
+                + "- Use bullet points and structured responses when helpful\n"
+                + "- If someone wants to practice, ask them questions and evaluate their answers\n"
+                + "- Always be supportive and motivating\n\n"
+                + "Important rules:\n"
+                + "- Stay focused on interview prep, career advice, and resume topics\n"
+                + "- If asked off-topic questions, gently redirect to interview/career topics\n"
+                + "- Keep responses clear and actionable\n"
+                + "- Use markdown formatting for better readability (bold, bullets, code blocks for code)";
+
+        Map<String, Object> systemTextPart = new HashMap<>();
+        systemTextPart.put("text", systemPrompt);
+
+        Map<String, Object> systemInstruction = new HashMap<>();
+        systemInstruction.put("parts", List.of(systemTextPart));
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("contents", contents);
+        payload.put("system_instruction", systemInstruction);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(payload, headers);
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(apiUrl, requestEntity, String.class);
+
+        JsonNode rootNode = objectMapper.readTree(responseEntity.getBody());
+        return rootNode.path("candidates")
+                .get(0).path("content").path("parts").get(0).path("text")
+                .asText().trim();
+    }
+
     /**
      * Resume ATS Analysis using Gemini AI.
      */
