@@ -1,0 +1,12 @@
+# Ignore other personal projects in this repository
+safaResidency/
+StressPrediction/
+WeatherApplication/
+
+# Ignore build and IDE artifacts
+target/
+.vscode/
+*.log
+.DS_Store
+node_modules/
+dist/
