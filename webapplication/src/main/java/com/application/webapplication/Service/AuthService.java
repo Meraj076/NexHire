@@ -75,7 +75,7 @@ public class AuthService {
                                 .role(determineRole(request.email()))// Determine role dynamically based on configured admin emails
                                 .build();
 
-                // Saving Entity into MySQL Database
+                // Saving Entity into Database
                 UserEntity savedUser = userRepo.save(newUser);
 
                 // Convert save user to Spring Security's UserDetails for JWT generation.

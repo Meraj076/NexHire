@@ -23,7 +23,7 @@ public class PromptConfigEntity {
     @Column(name = "prompt_key", unique = true, nullable = false)
     private String promptKey;
 
-    @Column(name = "prompt_value", columnDefinition = "LONGTEXT", nullable = false)
+    @Column(name = "prompt_value", columnDefinition = "TEXT", nullable = false)
     private String promptValue;
 
     @Column(name = "description")

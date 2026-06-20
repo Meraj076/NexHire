@@ -58,4 +58,9 @@ public class AuthController {
         return ResponseEntity.ok(authService.googleLogin(request));
     }
 
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("OK");
+    }
+
 }

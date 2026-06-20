@@ -26,10 +26,10 @@ public class ResumeEntity {
     private String file_name;
 
     @Lob
-    @Column(name = "pdf_data", columnDefinition = "LONGBLOB", nullable = false)
+    @Column(name = "pdf_data", nullable = false)
     private byte[] pdfData;
 
-    @Column(name = "resume_text", columnDefinition = "LONGTEXT")
+    @Column(name = "resume_text", columnDefinition = "TEXT")
     private String resumeText;
 
     @Column(name = "ats_score")
