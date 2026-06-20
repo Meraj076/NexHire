@@ -1,0 +1,70 @@
+PROJECT PLAN & DEVELOPMENT LOG (StressOMeter)
+
+================================================================================
+1. PROJECT OVERVIEW
+================================================================================
+Goal: Build a Stress Prediction Web Application.
+Core Value: Analyze user lifestyle data to predict stress levels and suggest coping mechanisms.
+Tech Stack: Java (Spring Boot) Backend + HTML/CSS/JS Frontend.
+
+================================================================================
+2. DEVELOPMENT PHASES
+================================================================================
+
+PHASE 1: INITIAL SETUP & PROTOTYPING (Completed)
+------------------------------------------------
+- [x] Set up Spring Boot project with Maven.
+- [x] Create basic directory structure (Controller, Service, Templates).
+- [x] Implement basic Login and Dashboard views.
+- [x] Establish "Prediction Engine" (logic-based simulation).
+
+PHASE 2: UI/UX OVERHAUL (Completed)
+-----------------------------------
+- [x] Design "Space Theme" aesthetic (Deep Purple/Blue gradients).
+- [x] Implement Glassmorphism for cards and sidebars.
+- [x] Create dedicated Landing Page (`main1.html`) to explain the product.
+- [x] Ensure Mobile Responsiveness (Media Queries, Hamburger Menus).
+
+PHASE 3: FLOW REFINEMENT (Completed)
+------------------------------------
+- [x] Move Landing Page to Root (`/`).
+- [x] Integrate Auth Buttons (Sign Up/Login) correctly into the Landing Page header.
+- [x] Remove "Guest" access to encourage data tracking.
+- [x] Fix "Sign Up" flow to auto-login users (UX Friction reduction).
+
+PHASE 4: FEATURE EXPANSION (In Progress/Next)
+---------------------------------------------
+- [x] Add "Coping Strategies" module based on Root Cause.
+- [ ] (Future) Integrate real Machine Learning model (Python/Flask microservice).
+- [ ] (Future) Add "Community" features for shared support.
+- [ ] (Future) Email notifications for high-stress alerts.
+
+================================================================================
+3. DECISION LOG
+================================================================================
+[2026-01-08] Refined Landing Page Header:
+    - Problem: Mobile menu was cluttered, button visibility was poor.
+    - Solution: Moved "Sign Up" button INSIDE `nav` for mobile. Forced white text.
+    - Result: Cleaner mobile UI.
+
+[2026-01-07] Auth Flow change:
+    - Problem: Users had to log in again immediately after signing up.
+    - Solution: Implemented auto-login logic in `UserService`.
+
+[2026-01-05] Terminology Shift:
+    - Request: User wanted to remove "AI/ML" buzzwords.
+    - Action: Renamed to "Computational Model", "Advanced Analysis".
+
+================================================================================
+4. ARCHITECTURE NOTES
+================================================================================
+- The "Prediction" is currently stateless (calculated on the fly). 
+- History is stored in a temporary H2 database for the session.
+- Frontend uses Vanilla JS to keep it lightweight (`dashboard.js`).
+
+================================================================================
+5. HOW TO MAINTAIN
+================================================================================
+- To update the Landing Page: Edit `src/main/resources/templates/main1.html`.
+- To tweak Prediction Logic: Edit `src/main/java/.../service/PredictionService.java`.
+- To change Colors: Update `:root` variables in the `<style>` block of HTML files.

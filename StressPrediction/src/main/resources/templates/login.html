@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en"> 
+    <head> 
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>StressOMeter - Calibrate Your Calm</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Leckerli+One&display=swap" rel="stylesheet">
+<style>
+    /* StressOMeter Login/Signup Theme: Dark, Calming, Monitoring Look */
+
+:root {
+    --primary-color: #9c5cff; /* Light Violet/Purple - Main Action Color */
+    --secondary-color: #5d5dff; /* Blue/Violet for secondary elements */
+    --text-color: #e0e0ff; /* Light, calm text */
+    --bg-dark: #120a2e; /* Very dark background */
+    --auth-box-bg: rgba(45, 10, 80, 0.6); /* Slightly transparent box */
+    --input-bg: rgba(255, 255, 255, 0.1); /* Transparent input background */
+    --transition-speed: 0.3s;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-color);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ======================================================= */
+/* ANIMATION KEYFRAMES for Calmness Flow (Particles) */
+/* ======================================================= */
+@keyframes particle-flow {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.5;
+    }
+    100% {
+        transform: translateY(-1000px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* ======================================================= */
+/* COSMIC BACKGROUND with ANIMATED PARTICLES */
+/* ======================================================= */
+.main-screen {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at 10% 20%, #2c0b48 0%, #00001a 100%);
+    background-size: cover;
+    background-position: center;
+    padding: 20px;
+    position: relative; 
+    overflow: hidden;
+}
+
+/* First animation layer: Particles flowing up */
+.main-screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; 
+    pointer-events: none; 
+
+    /* Define subtle particle positions and colors */
+    box-shadow: 
+        10vw 20vh 5px 1px #9c5cff, 
+        50vw 80vh 4px 1px #5d5dff, 
+        80vw 50vh 3px 0.5px #e0e0ff, 
+        30vw 10vh 2px 1px #6a0dad, 
+        90vw 90vh 1px 0.5px #e0e0ff;
+    
+    animation: particle-flow 30s linear infinite;
+}
+
+/* Second animation layer: Slower particles, flowing in reverse for depth */
+.main-screen::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    box-shadow: 
+        -10vw 40vh 4px 1px #5d5dff,
+        -60vw 60vh 3px 0.5px #9c5cff;
+        
+    animation: particle-flow 45s linear infinite reverse;
+    opacity: 0.7;
+}
+
+/* --- THEME TITLE / SLOGAN --- */
+.theme-slogan {
+    font-family: 'great vibes', cursive;
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 0 15px;
+}
+.theme-slogan h1 {
+    font-family: 'Leckerli One', cursive; 
+    font-size: 2.8em;
+    font-weight: normal; 
+    color: var(--primary-color);
+    letter-spacing: 3px; 
+}
+.theme-slogan p {
+    font-size: 1.1em;
+    font-style: italic;
+    color: #cccccc;
+}
+
+/* --- AUTH CONTAINER (The Main Box) --- */
+.auth-container {
+    width: 100%;
+    max-width: 400px;
+    background: var(--auth-box-bg);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    padding: 30px;
+    backdrop-filter: blur(5px);
+    z-index: 10; /* Animation se upar */
+}
+.auth-box {
+    text-align: center;
+}
+.auth-box h2 {
+    font-family: 'Leckerli One', cursive; 
+    font-size: 1.9em;
+    margin-bottom: 25px;
+    color: var(--primary-color);
+    letter-spacing: 2px;
+    font-weight: normal;
+}
+
+/* --- FORM & INPUTS --- */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+input[type="email"], input[type="password"], input[type="text"], input[type="number"] {
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    background: var(--input-bg);
+    color: var(--text-color);
+    font-size: 1em;
+    transition: box-shadow var(--transition-speed);
+}
+.input-group {
+    margin-bottom: 5px;
+    width: 100%;
+}
+.input-group input {
+    width: 100%;
+}
+input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+/* --- BUTTONS & LINKS --- */
+.btn {
+    padding: 15px 20px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'great vibes', cursive;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color var(--transition-speed), transform 0.2s;
+}
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 15px rgba(156, 92, 255, 0.4);
+}
+.btn-primary:hover {
+    background-color: #b380ff;
+    transform: translateY(-2px);
+}
+.btn-secondary {
+    background-color: transparent;
+    border: 2px solid var(--secondary-color);
+    color: var(--secondary-color);
+    margin-top: 5px;
+    width: 100%;
+}
+.btn-secondary:hover {
+    background-color: rgba(93, 93, 255, 0.1);
+    transform: translateY(-2px);
+}
+.guest-option p {
+    font-size: 1.1em;
+    text-align: center;
+    margin: 15px 0;
+    color: #cccccc;
+    font-weight: 300;
+}
+.terms {
+    display: flex;
+    align-items: center;
+    margin: 5px 0 10px;
+    font-size: 0.9em;
+    text-align: left;
+}
+.terms input[type="checkbox"] {
+    /* Custom checkbox styling */
+}
+
+.auth-switch a, .dummy-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-family: 'great vibes', cursive;
+    font-weight: bold;
+    transition: color var(--transition-speed);
+}
+.auth-switch a:hover, .dummy-link:hover {
+    color: #c9a6ff;
+}
+
+/* RESPONSIVENESS */
+@media (min-width: 768px) {
+    .theme-slogan {
+        margin-bottom: 50px;
+    }
+    .theme-slogan h1 {
+        font-size: 3em;
+    }
+    .auth-container {
+        padding: 40px;
+        border-radius: 20px;
+    }
+}
+</style>
+
+
+</head> <body> <div class="main-screen">
+
+
+    <div class="theme-slogan">
+        <h1>StressOMeter</h1>
+        <p>Ready to **Calibrate Your Calm**?</p>
+    </div>
+
+    <div class="auth-container">
+        
+        <div class="auth-box" id="login-box">
+            <h2>CALIBRATE</h2>
+            <form id="login-form">
+                <div class="input-group">
+                    <input type="email" id="login-email" placeholder="Email Address" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="login-password" placeholder="Monitor Key (Password)" required>
+                </div>
+                <button type="submit" class="btn btn-primary">De-Stress & Login</button>
+                
+                <p class="auth-switch">Need an account? <a href="#" id="show-signup">Begin Monitoring (Sign Up)</a></p>
+                <a href="#" class="dummy-link">Reset Monitor Key?</a>
+            </form>
+        </div>
+
+        <div class="auth-box" id="signup-box" style="display:none;">
+            <h2>BEGIN MONITORING</h2>
+            <form id="signup-form">
+                <div class="input-group">
+                    <input type="text" id="signup-username" placeholder="Username" required>
+                </div>
+                <div class="input-group">
+                    <input type="number" id="signup-age" placeholder="Age (for better prediction)" min="13" max="120" required>
+                </div>
+                <div class="input-group">
+                    <input type="email" id="signup-email" placeholder="Email Address" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="signup-password" placeholder="Set Monitor Key (Password)" required>
+                </div>
+                <div class="terms">
+                    <input type="checkbox" id="terms" required>
+                    <label for="terms">I agree to the **StressOMeter** Terms & Conditions</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Start Prediction</button>
+                
+                <p class="auth-switch">Already monitoring? <a href="#" id="show-login">Calibrate (Login)</a></p>
+            </form>
+        </div>
+
+        <!-- Guest option removed as requested -->
+    </div>
+</div>
+
+<script>
+    // Auth Logic
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+
+    // Login
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                window.location.href = '/dashboard';
+            } else {
+                alert(data.error || 'Login failed');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Something went wrong!');
+        }
+    });
+
+    // Signup
+    signupForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('signup-username').value;
+        const age = document.getElementById('signup-age').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+
+        try {
+            const res = await fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, age, email, password })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                // Auto-Login after Signup
+                try {
+                    const loginRes = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    if(loginRes.ok) {
+                         window.location.href = '/dashboard';
+                    } else {
+                         alert('Signup successful, but auto-login failed. Please login manually.');
+                         document.getElementById('signup-box').style.display = 'none';
+                         document.getElementById('login-box').style.display = 'block';
+                    }
+                } catch(e) {
+                     alert('Signup successful, please login manually.');
+                     document.getElementById('signup-box').style.display = 'none';
+                     document.getElementById('login-box').style.display = 'block';
+                }
+            } else {
+                alert(data.error || 'Signup failed');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Something went wrong!');
+        }
+    });
+
+    // Toggle forms
+    document.getElementById('show-signup').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('login-box').style.display = 'none';
+        document.getElementById('signup-box').style.display = 'block';
+    });
+
+    document.getElementById('show-login').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('signup-box').style.display = 'none';
+        document.getElementById('login-box').style.display = 'block';
+    });
+</script>
+</body>
+</html>

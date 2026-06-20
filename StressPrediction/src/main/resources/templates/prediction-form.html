@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Prediction - Wellness Check</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light Theme with Purple & Blue Pastels */
+            --primary-purple: #8b5cf6;
+            --primary-blue: #3b82f6;
+            --pastel-purple: linear-gradient(135deg, #e9d5ff 0%, #c4b5fd 100%);
+            --pastel-blue: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
+            --pastel-mint: linear-gradient(135deg, #b2f2bb 0%, #95e9a3 100%);
+            --pastel-peach: linear-gradient(135deg, #ffd6cc 0%, #ffb5a7 100%);
+            --pastel-yellow: linear-gradient(135deg, #fff5b4 0%, #ffe99a 100%);
+            --gradient-purple-blue: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+            
+            --bg-color: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            --card-bg: #ffffff;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --text-muted: #a0aec0;
+            --border-color: #e2e8f0;
+            
+            --success-green: #10b981;
+            --warning-yellow: #f59e0b;
+            --danger-red: #ef4444;
+            
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 50px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background Shapes */
+        .bg-shapes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .shape1 {
+            width: 300px;
+            height: 300px;
+            background: var(--pastel-blue);
+            top: -150px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+
+        .shape2 {
+            width: 200px;
+            height: 200px;
+            background: var(--pastel-purple);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: 5s;
+        }
+
+        .shape3 {
+            width: 250px;
+            height: 250px;
+            background: var(--pastel-mint);
+            top: 50%;
+            left: 50%;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translate(0, 0) rotate(0deg); 
+            }
+            25% { 
+                transform: translate(50px, -50px) rotate(90deg); 
+            }
+            50% { 
+                transform: translate(-30px, 30px) rotate(180deg); 
+            }
+            75% { 
+                transform: translate(-50px, -20px) rotate(270deg); 
+            }
+        }
+
+        /* Container for consistent max-width */
+        .main-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            background: var(--gradient-purple-blue);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            font-weight: 300;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 0 10px;
+            animation: fadeIn 1s ease;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-purple-blue);
+            border-radius: 20px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Age Input Card */
+        .age-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: clamp(20px, 5vw, 40px);
+            box-shadow: var(--shadow-soft);
+            width: 100%;
+            text-align: center;
+            animation: slideIn 0.8s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .age-card h2 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-weight: 500;
+            font-size: clamp(1.3rem, 4vw, 1.8rem);
+        }
+
+        .age-card p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+        }
+
+        .age-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .age-input {
+            padding: 12px 20px;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            width: 100%;
+            max-width: 200px;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .age-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .age-input:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .age-submit-btn {
+            padding: 12px 30px;
+            background: var(--gradient-purple-blue);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .age-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+        }
+
+        .age-submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Question Container */
+        .question-container {
+            width: 100%;
+            min-height: 400px;
+            position: relative;
+            display: none;
+            padding: 10px;
+        }
+
+        .question-container.active {
+            display: block;
+        }
+
+        /* Question Card */
+        .question-card {
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 25px;
+            padding: clamp(20px, 5vw, 40px);
+            box-shadow: var(--shadow-soft);
+            display: none;
+            animation: cardSlideIn 0.6s ease;
+        }
+
+        .question-card.active {
+            display: block;
+        }
+
+        /* Card Gradient Overlays */
+        .card-gradient-1 { 
+            background: linear-gradient(135deg, rgba(189, 224, 229, 0.3) 0%, rgba(168, 218, 220, 0.3) 100%), white; 
+        }
+        .card-gradient-2 { 
+            background: linear-gradient(135deg, rgba(233, 213, 255, 0.3) 0%, rgba(196, 181, 253, 0.3) 100%), white; 
+        }
+        .card-gradient-3 { 
+            background: linear-gradient(135deg, rgba(178, 242, 187, 0.3) 0%, rgba(149, 233, 163, 0.3) 100%), white; 
+        }
+        .card-gradient-4 { 
+            background: linear-gradient(135deg, rgba(255, 214, 204, 0.3) 0%, rgba(255, 181, 167, 0.3) 100%), white; 
+        }
+        .card-gradient-5 { 
+            background: linear-gradient(135deg, rgba(255, 245, 180, 0.3) 0%, rgba(255, 233, 154, 0.3) 100%), white; 
+        }
+
+        @keyframes cardSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        .question-card.exit-left {
+            animation: cardSlideOut 0.5s ease forwards;
+        }
+
+        @keyframes cardSlideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50px) scale(0.95);
+            }
+        }
+
+        .question-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            background: var(--gradient-purple-blue);
+            color: white;
+            border-radius: 50%;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .question-text {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: var(--text-primary);
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* Answer Options */
+        .answer-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .answer-option {
+            background: rgba(249, 250, 251, 0.8);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: clamp(12px, 3vw, 15px) clamp(15px, 4vw, 20px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            color: var(--text-primary);
+        }
+
+        .answer-option:hover {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e6edff 100%);
+            border-color: var(--primary-purple);
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .answer-option.selected {
+            background: var(--gradient-purple-blue);
+            color: white;
+            border-color: transparent;
+        }
+
+        .emoji {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Motivational Message */
+        .motivation-message {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #95e9a3 0%, #b2f2bb 100%);
+            color: #2d6a4f;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-weight: 500;
+            text-align: center;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            box-shadow: 0 5px 15px rgba(149, 233, 163, 0.3);
+            animation: motivationPop 0.6s ease;
+        }
+
+        @keyframes motivationPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Result Card */
+        .result-card {
+            background: var(--card-bg);
+            border-radius: 25px;
+            padding: clamp(20px, 5vw, 40px);
+            box-shadow: var(--shadow-soft);
+            width: 100%;
+            text-align: center;
+            display: none;
+            animation: resultReveal 1s ease;
+        }
+
+        .result-card.show {
+            display: block;
+        }
+
+        @keyframes resultReveal {
+            from {
+                opacity: 0;
+                transform: scale(0.8) rotateY(180deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotateY(0);
+            }
+        }
+
+        .result-card h2 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: clamp(1.3rem, 4vw, 1.8rem);
+        }
+
+        .stress-meter {
+            width: clamp(150px, 40vw, 200px);
+            height: clamp(150px, 40vw, 200px);
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .meter-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                #10b981 0deg,
+                #f59e0b 120deg,
+                #ef4444 240deg,
+                #10b981 360deg
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: rotate 3s linear infinite;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .meter-inner {
+            width: 80%;
+            height: 80%;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2rem, 8vw, 3rem);
+        }
+
+        .stress-level {
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: 600;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .stress-low {
+            background: linear-gradient(135deg, #b2f2bb 0%, #95e9a3 100%);
+            color: #2d6a4f;
+        }
+
+        .stress-moderate {
+            background: linear-gradient(135deg, #fff5b4 0%, #ffe99a 100%);
+            color: #f59e0b;
+        }
+
+        .stress-high {
+            background: linear-gradient(135deg, #ffd6cc 0%, #ffb5a7 100%);
+            color: #dc2626;
+        }
+
+        .stress-message {
+            color: var(--text-secondary);
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            line-height: 1.6;
+            margin: 20px 0;
+            padding: 0 10px;
+        }
+
+        .coping-tips {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e6edff 100%);
+            border-radius: 20px;
+            padding: clamp(15px, 4vw, 25px);
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .coping-tips h3 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-weight: 500;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+        }
+
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 10px 0;
+            color: var(--text-secondary);
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            line-height: 1.5;
+        }
+
+        .tip-icon {
+            min-width: 25px;
+            width: 25px;
+            height: 25px;
+            background: var(--gradient-purple-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 0 10px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 15px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--gradient-purple-blue);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Floating Leaves */
+        .floating-leaf {
+            position: fixed;
+            font-size: 2em;
+            opacity: 0.3;
+            animation: floatLeaf 15s infinite ease-in-out;
+            z-index: -1;
+        }
+
+        .leaf1 { top: 10%; left: 10%; animation-delay: 0s; }
+        .leaf2 { top: 20%; right: 10%; animation-delay: 5s; }
+        .leaf3 { bottom: 20%; left: 5%; animation-delay: 10s; }
+
+        @keyframes floatLeaf {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(30px, -30px) rotate(90deg); }
+            50% { transform: translate(-20px, 20px) rotate(180deg); }
+            75% { transform: translate(-30px, -10px) rotate(270deg); }
+        }
+
+        /* Media Queries for Better Responsiveness */
+        @media (min-width: 480px) {
+            .age-input-group {
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .action-buttons {
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .btn {
+                width: auto;
+                min-width: 150px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+
+            .header {
+                margin-bottom: 30px;
+            }
+
+            .progress-container {
+                margin-bottom: 30px;
+            }
+
+            .question-container {
+                min-height: 450px;
+            }
+        }
+
+        /* Loading Dots */
+        .loading-dots {
+            display: inline-flex;
+            gap: 5px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary-purple);
+            animation: loadingDot 1.5s infinite ease-in-out;
+        }
+
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes loadingDot {
+            0%, 80%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            40% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background Shapes -->
+    <div class="bg-shapes">
+        <div class="shape shape1"></div>
+        <div class="shape shape2"></div>
+        <div class="shape shape3"></div>
+    </div>
+
+    <!-- Floating Leaves -->
+    <div class="floating-leaf leaf1">🌿</div>
+    <div class="floating-leaf leaf2">🍃</div>
+    <div class="floating-leaf leaf3">🌱</div>
+
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Stress Check ✨</h1>
+            <p>Let's understand how you're feeling today</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progressContainer" style="display: none;">
+            <div class="progress-info">
+                <span>Question <span id="currentQuestion">1</span> of <span id="totalQuestions">10</span></span>
+                <span id="progressPercent">10%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- Age Input Card -->
+        <div class="age-card" id="ageCard">
+            <h2>Let's get started! 🌟</h2>
+            <p>First, tell us your age to personalize your experience</p>
+            <div class="age-input-group">
+                <input type="number" 
+                       class="age-input" 
+                       id="ageInput" 
+                       placeholder="Your age" 
+                       min="5" 
+                       max="100">
+                <button class="age-submit-btn" onclick="startAssessment()">
+                    Begin Journey
+                </button>
+            </div>
+        </div>
+
+        <!-- Question Container -->
+        <div class="question-container" id="questionContainer">
+            <!-- Questions will be dynamically inserted here -->
+        </div>
+
+        <!-- Result Card -->
+        <div class="result-card" id="resultCard">
+            <h2>Your Wellness Report 📊</h2>
+            
+            <div class="stress-meter">
+                <div class="meter-circle">
+                    <div class="meter-inner" id="stressEmoji">😊</div>
+                </div>
+            </div>
+
+            <div class="stress-level" id="stressLevel">
+                <!-- Stress level will be displayed here -->
+            </div>
+
+            <p class="stress-message" id="stressMessage">
+                <!-- Personalized message -->
+            </p>
+
+            <div class="coping-tips">
+                <h3>💡 Personalized Tips for You</h3>
+                <div id="copingTipsList">
+                    <!-- Tips will be dynamically added -->
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="retakeAssessment()">
+                    Retake Assessment
+                </button>
+                <button class="btn btn-secondary" onclick="window.location.href='/dashboard'">
+                    Go to Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+    // Question Sets based on Age Groups
+
+    const stressQuestions = {
+
+    // Kids (5-20 years) - Emojis retained
+
+    kids: [
+       [
+    {
+        "id": 1,
+        "question": "What is your gender?",
+        "answers": [
+            { "text": "Female", "value": 0 },
+            { "text": "Male", "value": 1 },
+            { "text": "Other", "value": 2 }
+        ]
+    },
+    {
+        "id": 2,
+        "question": "Have you recently experienced stress in your life?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 3,
+        "question": "Have you noticed a rapid heartbeat or palpitations?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 4,
+        "question": "Have you been dealing with general anxiety or tension recently?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 5,
+        "question": "Do you face any sleep problems or difficulties falling asleep?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 6,
+        "question": "Does anxiety or tension keep you awake or disturb your sleep?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 7,
+        "question": "Have you been getting headaches more often than usual?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 8,
+        "question": "Do you get irritated easily?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 9,
+        "question": "Do you have trouble concentrating on your academic tasks?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 10,
+        "question": "Have you been feeling sadness or low mood?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 11,
+        "question": "Have you been experiencing any illness or health issues?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 12,
+        "question": "Do you often feel lonely or isolated?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 13,
+        "question": "Do you feel overwhelmed with your academic workload?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 14,
+        "question": "Are you in competition with your peers, and does it affect you?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 15,
+        "question": "Do you find that your relationship often causes you stress?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 16,
+        "question": "Are you facing any difficulties with your professors or instructors?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 17,
+        "question": "Is your working environment unpleasant or stressful?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 18,
+        "question": "Do you struggle to find time for relaxation and leisure activities?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 19,
+        "question": "Is your hostel or home environment causing you difficulties?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 20,
+        "question": "Do you lack confidence in your academic performance?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 21,
+        "question": "Do you lack confidence in your choice of academic subjects?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 22,
+        "question": "Are your academic and extracurricular activities conflicting for you?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 23,
+        "question": "Do you attend classes regularly?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 24,
+        "question": "Have you gained/lost weight (in a way that concerns you)?",
+        "answers": [
+            { "text": "Never (1)", "value": 1 },
+            { "text": "Rarely (2)", "value": 2 },
+            { "text": "Sometimes (3)", "value": 3 },
+            { "text": "Often (4)", "value": 4 },
+            { "text": "Always/Extremely (5)", "value": 5 }
+        ]
+    }
+
+    ] 
+],
+
+    // Seniors (20 to 60+ years) - Emojis removed
+    seniors: [
+       [
+        {
+        "id": 0,
+        "question": "What is your gender?",
+        "answers": [
+            { "text": "Male", "value": "0" },
+            { "text": "Female", "value": "1" },
+            { "text": "Other", "value": "2" }
+        ]
+    },
+    {
+        "id": 1,
+        "question": "What is your Occupation?",
+        "answers": [
+            { "text": "Doctor", "value": "0" },
+            { "text": "Engineer", "value": "1" },
+            { "text": "Others", "value": "2" }
+        ]
+    },
+    {
+        "id": 2,
+        "question": "What is your current marital status?",
+        "answers": [
+            { "text": "Single", "value": "1" },
+            { "text": "Married", "value": "2" },
+            { "text": "Other", "value": "3" }
+        ]
+    },
+    {
+        "id": 3,
+        "question": "How many hours of sleep do you get on average per night?",
+        "answers": [
+            { "text": "< 5 hours", "value": 4 },
+            { "text": "5-7 hours", "value": 6 },
+            { "text": "7-9 hours", "value": 8 },
+            { "text": "> 9 hours", "value": 10 }
+        ]
+    },
+    {
+        "id": 4,
+        "question": "How would you rate your typical sleep quality?",
+        "answers": [
+            { "text": "Very Poor (1)", "value": 1 },
+            { "text": "Poor (2)", "value": 2 },
+            { "text": "Average (3)", "value": 3 },
+            { "text": "Good (4)", "value": 4 },
+            { "text": "Excellent (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 5,
+        "question": "On a scale of 1-5, how physically active are you (daily movement, exercise)?",
+        "answers": [
+            { "text": "Very Low (1)", "value": 1 },
+            { "text": "Low (2)", "value": 2 },
+            { "text": "Moderate (3)", "value": 3 },
+            { "text": "High (4)", "value": 4 },
+            { "text": "Very High (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 6,
+        "question": "On average, how many hours per day do you spend on screens (phone, computer, TV)?",
+        "answers": [
+            { "text": "< 2 hours", "value": 1 },
+            { "text": "2-4 hours", "value": 3 },
+            { "text": "4-6 hours", "value": 5 },
+            { "text": "> 6 hours", "value": 7 }
+        ]
+    },
+    {
+        "id": 7,
+        "question": "How many cups of caffeinated beverages (coffee, tea, soda) do you consume per day?",
+        "answers": [
+            { "text": "None", "value": 0 },
+            { "text": "1-2 cups", "value": 1.5 },
+            { "text": "3-4 cups", "value": 3.5 },
+            { "text": "> 4 cups", "value": 5 }
+        ]
+    },
+    {
+        "id": 8,
+        "question": "How many standard units of alcohol do you consume per week?",
+        "answers": [
+            { "text": "None", "value": 0 },
+            { "text": "1-7 units", "value": 4 },
+            { "text": "8-14 units", "value": 11 },
+            { "text": "> 14 units", "value": 15 }
+        ]
+    },
+    {
+        "id": 9,
+        "question": "Do you currently smoke (cigarettes, vaping, etc.)?",
+        "answers": [
+            { "text": "Yes", "value": "1" },
+            { "text": "No", "value": "0" }
+        ]
+    },
+    {
+        "id": 10,
+        "question": "How many hours do you typically work per day?",
+        "answers": [
+            { "text": "< 6 hours", "value": 5 },
+            { "text": "6-8 hours", "value": 7 },
+            { "text": "8-10 hours", "value": 9 },
+            { "text": "> 10 hours", "value": 11 }
+        ]
+    },
+    {
+        "id": 11,
+        "question": "How many hours per day do you spend commuting or traveling for work/personal reasons?",
+        "answers": [
+            { "text": "< 0.5 hours", "value": 0.25 },
+            { "text": "0.5-1 hour", "value": 0.75 },
+            { "text": "1-2 hours", "value": 1.5 },
+            { "text": "> 2 hours", "value": 3 }
+        ]
+    },
+    {
+        "id": 12,
+        "question": "On a scale of 1-5, how frequent and meaningful are your social interactions?",
+        "answers": [
+            { "text": "Very Infrequent/Poor (1)", "value": 1 },
+            { "text": "Infrequent (2)", "value": 2 },
+            { "text": "Average (3)", "value": 3 },
+            { "text": "Frequent (4)", "value": 4 },
+            { "text": "Very Frequent/Good (5)", "value": 5 }
+        ]
+    },
+    {
+        "id": 13,
+        "question": "Do you regularly practice meditation or mindfulness?",
+        "answers": [
+            { "text": "Yes", "value": "1" },
+            { "text": "No", "value": "0" }
+        ]
+    },
+    {
+        "id": 14,
+        "question": "What is your primary type of exercise?",
+        "answers": [
+            { "text": "None", "value": "0" },
+            { "text": "Cardio", "value": "1" },
+            { "text": "Strength", "value": "2" },
+            { "text": "Mixed/Other", "value": "2" }
+        ]
+    },
+
+    {
+        "id": 15,
+        "question": "What is your most recent Blood Pressure reading? (Systolic/Diastolic)",
+        "answers": [
+            { "text": "Optimal (e.g., 120/80 or lower)", "value": 1 },
+            { "text": "Normal/Elevated (e.g., 120-129/80-84)", "value": 3 },
+            { "text": "High Stage 1 (e.g., 130-139/85-89)", "value": 5 },
+            { "text": "High Stage 2 (140/90 or higher)", "value": 8 }
+        ]
+    },
+    {
+        "id": 16,
+        "question": "What is your most recent Total Cholesterol Level?",
+        "answers": [
+            { "text": "Low Risk (Below 200 mg/dL)", "value": 1 },
+            { "text": "Borderline High (200-239 mg/dL)", "value": 5 },
+            { "text": "High Risk (240 mg/dL or higher)", "value": 8 }
+        ]
+    },
+    {
+        "id": 17,
+        "question": "What is your most recent Fasting Blood Sugar Level?",
+        "answers": [
+            { "text": "Normal (Below 100 mg/dL)", "value": 1 },
+            { "text": "Prediabetic (100-125 mg/dL)", "value": 5 },
+            { "text": "Diabetic (126 mg/dL or higher)", "value": 8 }
+        ]
+    }
+]
+    ]
+};
+
+        // Motivational messages
+        const motivationalMessages = [
+            "You're doing great! ",
+            "Keep going, you got this! ",
+            "Almost there! ",
+            "You're amazing! ",
+            "Stay strong! ",
+            "Great progress! "
+        ];
+
+        // Global variables
+        let currentAge = 0;
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let answers = [];
+
+        // Start Assessment
+        function startAssessment() {
+            const ageInput = document.getElementById('ageInput');
+            const age = parseInt(ageInput.value);
+
+            if (!age || age < 5 || age > 100) {
+                // Shake animation for invalid input
+                ageInput.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    ageInput.style.animation = '';
+                }, 500);
+                return;
+            }
+
+            currentAge = age;
+            
+            // Select questions based on age
+            if (age >= 5 && age <= 20) {
+                currentQuestions = stressQuestions.kids[0];
+            } else if (age >= 21 && age <=80 ) {
+                currentQuestions = stressQuestions.seniors[0];
+            }else{
+                currentQuestions = stressQuestions.seniors[0];
+            }
+
+            // Check if questions were loaded successfully
+            if (!currentQuestions || currentQuestions.length === 0) {
+                console.error("Error: No questions loaded for this age group or currentQuestions is not an array.");
+                alert("Sorry, no questions are available for this age group yet!");
+                return; 
+            }
+
+            // Hide age card with animation
+            const ageCard = document.getElementById('ageCard');
+            ageCard.style.animation = 'slideOut 0.5s ease forwards';
+            
+            setTimeout(() => {
+                ageCard.style.display = 'none';
+                document.getElementById('progressContainer').style.display = 'block';
+                document.getElementById('totalQuestions').textContent = currentQuestions.length;
+                document.getElementById('questionContainer').classList.add('active');
+                showQuestion(0);
+            }, 500);
+        }
+
+        // Show Question
+        function showQuestion(index) {
+            if (index >= currentQuestions.length) {
+                showResults();
+                return;
+            }
+
+            const container = document.getElementById('questionContainer');
+            const question = currentQuestions[index];
+
+            // Remove old cards
+            const oldCards = container.querySelectorAll('.question-card');
+            oldCards.forEach(card => card.remove());
+
+            const cardGradient = `card-gradient-${(index % 5) + 1}`;
+            const questionCard = document.createElement('div');
+            questionCard.className = `question-card ${cardGradient}`;
+            
+            const showMotivation = index > 0 && index % 2 === 0;
+            
+       // ... inside showQuestion(index) function ...
+
+// Old Card removal and setup remains the same...
+
+            questionCard.innerHTML = `
+                <div class="question-number">${index + 1}</div>
+                <div class="question-text">${question.question}</div>
+                <div class="answer-options">
+                   ${question.answers.map((answer, i) => `
+                     <div class="answer-option" onclick="selectAnswer(${index}, ${answer.value}, this)">
+                       ${answer.emoji ? `<span class="emoji">${answer.emoji}</span>` : ''} 
+                            <span>${answer.text}</span>
+                        </div>
+                 `).join('')}
+                     </div>
+                  ${showMotivation ? `<div class="motivation-message">${motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)]}</div>` : ''}
+              `;
+
+// ... rest of the function ...
+
+            container.appendChild(questionCard);
+            
+            // Show card with animation
+            setTimeout(() => {
+                questionCard.classList.add('active');
+            }, 50);
+
+            // Update progress
+            updateProgress(index + 1);
+        }
+
+        // Select Answer
+        function selectAnswer(questionIndex, value, element) {
+            // Visual feedback
+            element.classList.add('selected');
+            answers.push(value);
+
+            // Disable other options
+            const options = element.parentElement.querySelectorAll('.answer-option');
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+
+            // Move to next question after delay
+            setTimeout(() => {
+                const currentCard = document.querySelector('.question-card.active');
+                if (currentCard) {
+                    currentCard.classList.remove('active');
+                    currentCard.classList.add('exit-left');
+                }
+
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    showQuestion(currentQuestionIndex);
+                }, 300);
+            }, 500);
+        }
+
+        // Update Progress
+        function updateProgress(current) {
+            const total = currentQuestions.length;
+            const percentage = (current / total) * 100;
+            
+            document.getElementById('currentQuestion').textContent = current;
+            document.getElementById('progressPercent').textContent = Math.round(percentage) + '%';
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+
+        // Show Results
+        function showResults() {
+            // Attempt to send answers to backend for model prediction.
+            const payload = { age: currentAge, answers: answers };
+
+            // Show loading state
+            const resultCard = document.getElementById('resultCard');
+            const tipsList = document.getElementById('copingTipsList');
+            if (document.getElementById('questionContainer')) document.getElementById('questionContainer').style.display = 'none';
+            if (document.getElementById('progressContainer')) document.getElementById('progressContainer').style.display = 'none';
+            if (document.getElementById('stressEmoji')) document.getElementById('stressEmoji').textContent = '⏳';
+            if (document.getElementById('stressLevel')) document.getElementById('stressLevel').textContent = 'Calculating...';
+            if (document.getElementById('stressMessage')) document.getElementById('stressMessage').textContent = 'Contacting prediction server...';
+            if (resultCard) resultCard.classList.add('show');
+
+            fetch('/api/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(async res => {
+                if (!res.ok) {
+                    const txt = await res.text().catch(()=>'');
+                    console.error('Prediction server error', res.status, txt);
+                    doLocalResult('Server error: ' + (txt || res.status));
+                    return;
+                }
+                const data = await res.json();
+                const label = data.label || null;
+                const score = (data.score !== undefined && data.score !== null) ? Number(data.score) : null;
+
+                if (label) {
+                    let levelClass = '', emoji = '', message = '';
+                    if (/low/i.test(label)) { levelClass='stress-low'; emoji='😊'; message='Low stress — keep up the good work!'; }
+                    else if (/moderate|medium/i.test(label)) { levelClass='stress-moderate'; emoji='😐'; message='Moderate stress — try short relaxation exercises.'; }
+                    else if (/high|severe/i.test(label)) { levelClass='stress-high'; emoji='😔'; message='High stress — consider seeking support.'; }
+                    else {
+                        if (score !== null) {
+                            if (score <= 33) { levelClass='stress-low'; emoji='😊'; message='Low stress — keep up the good work!'; }
+                            else if (score <= 66) { levelClass='stress-moderate'; emoji='😐'; message='Moderate stress — try short relaxation exercises.'; }
+                            else { levelClass='stress-high'; emoji='😔'; message='High stress — consider seeking support.'; }
+                        } else { levelClass='stress-moderate'; emoji='😐'; message='Here is your result.'; }
+                    }
+                    if (document.getElementById('stressEmoji')) document.getElementById('stressEmoji').textContent = emoji;
+                    if (document.getElementById('stressLevel')) { document.getElementById('stressLevel').textContent = label; document.getElementById('stressLevel').className = 'stress-level ' + levelClass; }
+                    if (document.getElementById('stressMessage')) document.getElementById('stressMessage').textContent = message;
+                    const tips = levelClass === 'stress-low' ? ["Continue healthy routine","Stay active"] : levelClass === 'stress-moderate' ? ["Try breathing exercises","Take short breaks","Walk for 10 minutes"] : ["Talk to a counselor","Prioritize sleep","Reduce caffeine"];
+                    if (tipsList) tipsList.innerHTML = tips.map(t=>`<div class="tip-item"><div class="tip-icon">✓</div><span>${t}</span></div>`).join('');
+                } else if (score !== null) {
+                    let levelClass='', emoji='', message='';
+                    if (score <= 33) { levelClass='stress-low'; emoji='😊'; message='Low stress — keep up the good work!'; }
+                    else if (score <= 66) { levelClass='stress-moderate'; emoji='😐'; message='Moderate stress — try short relaxation exercises.'; }
+                    else { levelClass='stress-high'; emoji='😔'; message='High stress — consider seeking support.'; }
+                    if (document.getElementById('stressEmoji')) document.getElementById('stressEmoji').textContent = emoji;
+                    if (document.getElementById('stressLevel')) { document.getElementById('stressLevel').textContent = Math.round(score) + '%'; document.getElementById('stressLevel').className = 'stress-level ' + levelClass; }
+                    if (document.getElementById('stressMessage')) document.getElementById('stressMessage').textContent = message;
+                    if (tipsList) tipsList.innerHTML = (levelClass==='stress-low' ? ["Continue healthy routine","Stay active"] : levelClass==='stress-moderate' ? ["Try breathing exercises","Take short breaks","Walk for 10 minutes"] : ["Talk to a counselor","Prioritize sleep","Reduce caffeine"]).map(t=>`<div class="tip-item"><div class="tip-icon">✓</div><span>${t}</span></div>`).join('');
+                } else {
+                    doLocalResult('No label/score returned by server');
+                }
+            })
+            .catch(err => {
+                console.error('Prediction request failed', err);
+                doLocalResult('Network error: ' + err.message);
+            });
+
+            function doLocalResult(errMsg) {
+                console.warn('Falling back to local calculation:', errMsg);
+                // original local calculation (keeps behavior if backend not available)
+                const totalScore = answers.reduce((sum, val) => sum + (Number(val) || 0), 0);
+                const maxScore = currentQuestions.length * 5;
+                const percentage = maxScore>0 ? (totalScore / maxScore) * 100 : 0;
+                let stressLevel, emoji, message, levelClass;
+                let tips = [];
+                if (percentage <= 33) {
+                    stressLevel = "Low Stress";
+                    emoji = "😊";
+                    levelClass = "stress-low";
+                    message = "Great job! You're managing stress wonderfully. Keep up the positive lifestyle!";
+                    tips = ["Continue your healthy routine","Share your positive energy with others","Maintain work-life balance","Keep practicing mindfulness"];
+                } else if (percentage <= 66) {
+                    stressLevel = "Moderate Stress";
+                    emoji = "😐";
+                    levelClass = "stress-moderate";
+                    message = "You're experiencing some stress, which is normal. Let's work on some coping strategies!";
+                    tips = ["Try deep breathing exercises daily","Take short breaks during work","Go for a 15-minute walk","Practice gratitude journaling","Connect with loved ones"];
+                } else {
+                    stressLevel = "High Stress";
+                    emoji = "😔";
+                    levelClass = "stress-high";
+                    message = "You're experiencing high stress. It's important to prioritize self-care and seek support.";
+                    tips = ["Consider talking to a counselor","Practice meditation for 10 minutes daily","Establish a regular sleep schedule","Reduce caffeine intake","Engage in physical exercise","Take time for hobbies you enjoy"];
+                }
+                if (document.getElementById('stressEmoji')) document.getElementById('stressEmoji').textContent = emoji;
+                if (document.getElementById('stressLevel')) { document.getElementById('stressLevel').textContent = stressLevel; document.getElementById('stressLevel').className = `stress-level ${levelClass}`; }
+                if (document.getElementById('stressMessage')) document.getElementById('stressMessage').textContent = message;
+                if (tipsList) tipsList.innerHTML = tips.map(tip => `
+                    <div class="tip-item">
+                        <div class="tip-icon">✓</div>
+                        <span>${tip}</span>
+                    </div>
+                `).join('');
+                if (resultCard) resultCard.classList.add('show');
+            }
+        }
+
+        // Retake Assessment
+        function retakeAssessment() {
+            // Reset everything
+            currentQuestionIndex = 0;
+            answers = [];
+            currentQuestions = [];
+
+            // Hide result card
+            document.getElementById('resultCard').classList.remove('show');
+            document.getElementById('resultCard').style.display = 'none';
+
+            // Clear question container
+            document.getElementById('questionContainer').innerHTML = '';
+            document.getElementById('questionContainer').classList.remove('active');
+
+            // Show age card
+            const ageCard = document.getElementById('ageCard');
+            ageCard.style.display = 'block';
+            ageCard.style.animation = 'slideIn 0.8s ease';
+            document.getElementById('ageInput').value = '';
+        }
+
+        // Add shake animation style
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+            @keyframes slideOut {
+                to {
+                    opacity: 0;
+                    transform: translateY(-50px) scale(0.9);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Enter key support
+        document.getElementById('ageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                startAssessment();
+            }
+        });
+    </script>
+</body>
+</html>

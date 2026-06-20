@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coping Strategies | Stress Prediction</title>
+    <style>
+        :root {
+            --bg: #0f1724;
+            --panel: #0f1724;
+            --card: #0f2433;
+            --text: #e6eef6;
+            --muted: #9aa4b2;
+            --accent: #6ee7b7;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            
+            --light-bg: #f6f7fb;
+            --light-panel: #ffffff;
+            --light-card: #ffffff;
+            --light-text: #0b1020;
+            --light-muted: #6b7280;
+        }
+
+        /* Base Styles */
+        body { margin: 0; font-family: 'Inter', sans-serif; background: linear-gradient(180deg, #071226 0%, #0b1a2a 100%); color: var(--text); min-height: 100vh; }
+        body.light { background: var(--light-bg); color: var(--light-text); }
+        
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        
+        /* Header */
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        h1 { font-size: 32px; margin: 0; }
+        .back-btn { 
+            background: rgba(255,255,255,0.05); border: none; color: var(--text); 
+            padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 500;
+            display: flex; align-items: center; gap: 8px; text-decoration: none;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.1); }
+        body.light .back-btn { background: rgba(0,0,0,0.05); color: var(--light-text); }
+        body.light .back-btn:hover { background: rgba(0,0,0,0.1); }
+
+        /* Status Card */
+        .status-card {
+            background: var(--card); border-radius: 20px; padding: 30px;
+            text-align: center; margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        body.light .status-card { background: var(--light-card); box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); }
+
+        .stress-badge {
+            display: inline-block; padding: 8px 16px; border-radius: 99px;
+            font-weight: 700; font-size: 14px; margin-bottom: 16px; text-transform: uppercase;
+        }
+        .stress-badge.high { background: rgba(239,68,68,0.2); color: var(--danger); }
+        .stress-badge.medium { background: rgba(245,158,11,0.2); color: var(--warning); }
+        .stress-badge.low { background: rgba(16,185,129,0.2); color: var(--success); }
+
+        .score-display { font-size: 48px; font-weight: 800; margin-bottom: 10px; }
+        .status-msg { color: var(--muted); font-size: 16px; margin: 0; }
+        body.light .status-msg { color: var(--light-muted); }
+
+        /* Sections */
+        .strategies-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        
+        .strategy-card {
+            background: rgba(255,255,255,0.02); border-radius: 16px; padding: 24px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        body.light .strategy-card { background: #fff; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+
+        .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .card-icon { 
+            width: 40px; height: 40px; border-radius: 10px; display: flex; 
+            align-items: center; justify-content: center; font-size: 20px; 
+        }
+        .icon-med { background: linear-gradient(135deg, #ef4444, #f87171); color: white; }
+        .icon-ex { background: linear-gradient(135deg, #10b981, #34d399); color: white; }
+        .icon-act { background: linear-gradient(135deg, #3b82f6, #60a5fa); color: white; }
+
+        .card-title { font-size: 18px; font-weight: 600; margin: 0; }
+        
+        .tips-list { list-style: none; padding: 0; margin: 0; }
+        .tips-list li { 
+            padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); 
+            font-size: 14px; line-height: 1.5; color: var(--muted);
+        }
+        body.light .tips-list li { border-bottom: 1px solid rgba(0,0,0,0.05); color: var(--light-muted); }
+        .tips-list li:last-child { border-bottom: none; }
+        .tips-list li b { color: var(--text); }
+        body.light .tips-list li b { color: var(--light-text); }
+
+        /* Disclaimer */
+        .disclaimer-box {
+            margin-top: 40px; padding: 20px; border-radius: 12px;
+            background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);
+            color: #f59e0b; font-size: 13px; line-height: 1.5; display: flex; gap: 12px;
+        }
+        body.light .disclaimer-box { background: #fff8e6; border-color: #fde68a; color: #b45309; }
+        .disclaimer-icon { font-size: 20px; }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px 16px; }
+            h1 { font-size: 24px; }
+            .status-card { padding: 20px; }
+            .score-display { font-size: 36px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
+        <h1>Coping Strategies</h1>
+    </header>
+
+    <div id="loading" style="text-align:center; padding:40px; color:var(--muted);">Loading your profile...</div>
+
+    <div id="content" style="display:none;">
+        <div class="status-card">
+            <span class="stress-badge" id="stressBadge">--</span>
+            <div class="score-display"><span id="stressScore">--</span>%</div>
+            <p class="status-msg" id="statusMsg">Based on your recent analysis.</p>
+        </div>
+
+        <div class="strategies-grid">
+            <!-- Medical Advice -->
+            <div class="strategy-card">
+                <div class="card-header">
+                    <div class="card-icon icon-med">💊</div>
+                    <h3 class="card-title">Medical Advice</h3>
+                </div>
+                <ul class="tips-list" id="medTips">
+                    <!-- Dynamic -->
+                </ul>
+            </div>
+
+            <!-- Exercises -->
+            <div class="strategy-card">
+                <div class="card-header">
+                    <div class="card-icon icon-ex">🧘</div>
+                    <h3 class="card-title">Recommended Exercises</h3>
+                </div>
+                <ul class="tips-list" id="exTips">
+                   <!-- Dynamic -->
+                </ul>
+            </div>
+
+            <!-- Activities -->
+            <div class="strategy-card">
+                <div class="card-header">
+                    <div class="card-icon icon-act">🎨</div>
+                    <h3 class="card-title">Suggested Activities</h3>
+                </div>
+                <ul class="tips-list" id="actTips">
+                    <!-- Dynamic -->
+                </ul>
+            </div>
+        </div>
+
+        <div class="disclaimer-box">
+            <div class="disclaimer-icon">⚠️</div>
+            <div>
+                <b>Medical Disclaimer:</b> The "Medical Advice" provided above is generated based on general stress management guidelines. 
+                It is NOT a substitute for professional medical advice, diagnosis, or treatment. 
+                Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Theme Logic
+    const savedTheme = localStorage.getItem('dashboard-theme');
+    if(savedTheme === 'light') document.body.classList.add('light');
+
+    // Data Library
+    const strategies = {
+        high: {
+            med: [
+                "<b>Consult a Professional:</b> High stress levels may require intervention. Please speak to a doctor about anxiety management.",
+                "<b>Supplements (Start only after advice):</b> Magnesium, Ashwagandha, or Valerian Root are sometimes prescribed for severe stress.",
+                "<b>Sleep Aids:</b> If insomnia persists, ask your doctor about Melatonin or other non-habit forming options."
+            ],
+            ex: [
+                "<b>Deep Breathing (4-7-8):</b> Inhale for 4s, hold for 7s, exhale for 8s. Repeat 5 times.",
+                "<b>Progressive Muscle Relaxation:</b> Tense and relax each muscle group from toes to head.",
+                "<b>Brisk Walking:</b> 20 minutes to burn off cortisol."
+            ],
+            act: [
+                "<b>Digital Detox:</b> Disconnect from screens for at least 2 hours before bed.",
+                "<b>Journaling:</b> Write down your worries to 'offload' them from your brain.",
+                "<b>Therapy:</b> Consider booking a session with a counselor."
+            ]
+        },
+        medium: {
+            med: [
+                "<b>Hydration:</b> Ensure you are drinking enough water; dehydration mimics anxiety.",
+                "<b>Vitamin B Complex:</b> Supports nervous system health (consult pharmacist).",
+                "<b>Limit Caffeine:</b> Reduce intake to one cup in the morning only."
+            ],
+            ex: [
+                "<b>Yoga / Stretching:</b> 15 minutes of Hatha yoga to release tension.",
+                "<b>Light Jogging:</b> Boosts endorphins without over-exhausting.",
+                "<b>Meditation:</b> 10 minutes of guided mindfulness."
+            ],
+            act: [
+                "<b>Creative Hobbies:</b> Drawing, painting, or cooking a new recipe.",
+                "<b>Socialize:</b> Call a close friend or family member.",
+                "<b>Music:</b> Listen to 432Hz calming frequencies."
+            ]
+        },
+        low: {
+            med: [
+                "<b>Maintain Balance:</b> Continue your current healthy routine.",
+                "<b>Prevention:</b> A daily multivitamin may help maintain resilience.",
+                "<b>Herbal Tea:</b> Chamomile or Green tea for relaxation."
+            ],
+            ex: [
+                "<b>Regular Cardio:</b> Running, swimming, or cycling 3x a week.",
+                "<b>Strength Training:</b> Builds resilience and confidence.",
+                "<b>Nature Walks:</b> Spend time outdoors on weekends."
+            ],
+            act: [
+                "<b>Learn a Skill:</b> Use your mental energy to learn a language or instrument.",
+                "<b>Volunteering:</b> Helping others boosts well-being.",
+                "<b>Reading:</b> Dedicate 30 mins to reading fiction."
+            ]
+        }
+    };
+
+    // Fetch and Populate
+    async function init() {
+        try {
+            const res = await fetch('/api/history');
+            if(res.ok) {
+                const history = await res.json();
+                const latest = history.length > 0 ? history[0] : null;
+                
+                let score = 0;
+                let level = 'low';
+
+                if(latest) {
+                    score = Math.round(latest.score);
+                    if(score >= 66) level = 'high';
+                    else if(score >= 33) level = 'medium';
+                }
+
+                // Update UI
+                const badge = document.getElementById('stressBadge');
+                badge.textContent = level + ' Stress';
+                badge.className = 'stress-badge ' + level;
+                
+                document.getElementById('stressScore').textContent = score;
+
+                // Populate Lists
+                const data = strategies[level];
+                
+                document.getElementById('medTips').innerHTML = data.med.map(t => `<li>${t}</li>`).join('');
+                document.getElementById('exTips').innerHTML = data.ex.map(t => `<li>${t}</li>`).join('');
+                document.getElementById('actTips').innerHTML = data.act.map(t => `<li>${t}</li>`).join('');
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            } else {
+                 throw new Error('No Data');
+            }
+        } catch(e) {
+            document.getElementById('loading').innerHTML = "Could not load stress data. <br> <a href='/prediction-form'>Take a test first</a>";
+        }
+    }
+
+    init();
+</script>
+
+</body>
+</html>

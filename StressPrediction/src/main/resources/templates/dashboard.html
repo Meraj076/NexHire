@@ -1,0 +1,1024 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stress Prediction Dashboard</title>
+
+  <style>
+
+    :root {
+    --bg:#0f1724;
+    --panel:#0f1724;
+    --card:#0f2433;
+    --muted:#9aa4b2;
+    --text:#e6eef6;
+    --accent:#6ee7b7;
+    --glass: rgba(255,255,255,0.02);
+    --shadow: 0 8px 30px rgba(2,6,23,0.6);
+
+    --light-bg:#f6f7fb;
+    --light-panel:#ffffff;
+    --light-card:#ffffff;
+    --light-text:#0b1020;
+    --light-muted:#6b7280;
+    --light-accent:#3b0f6f;
+}
+
+/* Basic resets */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+body{background:linear-gradient(180deg,#071226 0%, #0b1a2a 100%);color:var(--text);}
+
+/* Light theme */
+body.light{
+    background: var(--light-bg);
+    color: var(--light-text);
+}
+body.light .main{background:transparent}
+
+/* App layout */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sidebar{
+    width:76px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:18px 10px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    border-right:1px solid rgba(255,255,255,0.02);
+    z-index:100;
+}
+.brand{margin-bottom:14px}
+.logo{
+    width:44px;height:44px;border-radius:10px;
+    background:linear-gradient(135deg,#6a5cff,#b48bff);
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;
+}
+
+.nav-icons{display:flex;flex-direction:column;gap:14px;flex:1}
+.icon-btn{
+    width:52px;height:52px;border-radius:14px;
+    background:var(--glass);
+    border:none;color:var(--text);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;box-shadow: var(--shadow);
+    transition:all .2s;
+}
+.icon-btn svg{
+    width:24px;
+    height:24px;
+}
+.icon-btn:hover{transform:translateY(-4px)}
+.icon-btn.active{background:linear-gradient(135deg,#eef2ff11, #c7ddff11);}
+.sidebar-bottom{margin-top:auto}
+.icon-btn.logout{background:transparent}
+
+/* Main area */
+.main{flex:1;overflow:auto;padding:28px 36px}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:22px;flex-wrap:wrap}
+.search-area h1{margin:0;font-size:34px;letter-spacing:-0.4px}
+.search-area .subtitle{color:var(--muted);margin-top:6px}
+.top-controls{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.search-input input{padding:12px 14px;border-radius:12px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text);min-width:280px;width:100%}
+.notif-btn{background:rgba(255,255,255,0.03);border:none;padding:10px;border-radius:10px;cursor:pointer}
+.profile{display:flex;align-items:center;gap:12px}
+.profile img{width:44px;height:44px;border-radius:10px}
+.profile-info{display:flex;flex-direction:column}
+.profile-info .name{font-weight:600}
+.profile-info .role{font-size:12px;color:var(--muted)}
+
+/* Cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:22px;margin-bottom:26px}
+.card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    padding:22px;
+    border-radius:16px;
+    box-shadow: 0 10px 30px rgba(2,6,23,0.5);
+    position:relative;
+}
+.card.big{grid-column:span 2;min-height:150px}
+.card-icon{
+    width:56px;height:56px;
+    border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:10px;font-size:24px;
+}
+.card-content .card-title{color:var(--muted);font-size:14px}
+.card-value{font-size:28px;font-weight:700;margin-top:6px}
+.card-meta{color:var(--muted);font-size:13px;margin-top:6px}
+.badge{position:absolute;top:14px;right:14px;padding:6px 10px;border-radius:12px;font-weight:700;font-size:13px}
+.badge.positive{background:#0ec06d;color:#05220a}
+.badge.negative{background:#ff7b7b;color:#431010}
+.badge.orange{background:#ffb067;color:#40260a}
+.badge.purple{background:#c7a8ff;color:#2a0b3a}
+
+/* Analytics and Quick Actions */
+.analytics{display:grid;grid-template-columns:1fr 320px;gap:22px;margin-bottom:26px}
+.chart-card,
+.quick-card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    padding:20px;
+    border-radius:16px;
+    box-shadow:var(--shadow);
+}
+.chart-card{overflow:hidden}
+.chart-card canvas{max-width:100%;height:auto !important}
+.quick-card{display:flex;flex-direction:column;gap:12px}
+.quick-card h3{margin:0 0 8px 0}
+.action{
+    padding:14px 18px;
+    border-radius:10px;
+    border:none;
+    background:rgba(255,255,255,0.04);
+    color:var(--text);
+    text-align:left;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:500;
+    transition:all 0.2s;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+.action:hover{
+    background:rgba(255,255,255,0.08);
+    transform:translateX(4px);
+}
+/* Fix for buttons inside links */
+.quick-card a {
+    display: block;
+    width: 100%;
+    text-decoration: none;
+}
+.action {
+    width: 100%; /* Ensure full width */
+    padding:14px 18px;
+    border-radius:10px;
+    background:linear-gradient(90deg,#6a5cff,#8b7aff);
+    color:white;
+}
+.action.primary:hover{
+    background:linear-gradient(90deg,#7c6cff,#9d8aff);
+    box-shadow:0 4px 12px rgba(106,92,255,0.3);
+}
+body.light .action{
+    background:rgba(16,16,24,0.04);
+    color:var(--light-text);
+}
+body.light .action:hover{
+    background:rgba(16,16,24,0.08);
+}
+body.light .action.primary{
+    background:linear-gradient(90deg,var(--light-accent),#7c5cff);
+    color:white;
+}
+
+/* Recent History / Table */
+.recent-header h3{margin:0 0 16px 0}
+.table-card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    padding:10px;
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    overflow-x:auto;
+}
+.table-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;align-items:center;padding:18px;border-bottom:1px solid rgba(255,255,255,0.02);min-width:600px}
+.table-row.header{font-size:13px;color:var(--muted);text-transform:uppercase}
+.txn{display:flex;align-items:center;gap:12px}
+.icon-square{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.icon-square.blue{background:linear-gradient(90deg,#3b82f6,#60a5fa);color:white}
+.icon-square.green{background:linear-gradient(90deg,#16a34a,#4ade80);color:white}
+.icon-square.amber{background:linear-gradient(90deg,#f59e0b,#fb923c);color:white}
+.txn-text .title{font-weight:600}
+.txn-text .sub{color:var(--muted);font-size:13px}
+.amount{font-weight:600}
+.amount.positive{color:#10b981}
+.status{padding:6px 10px;border-radius:12px;text-align:center;font-size:13px}
+.status.complete{background:rgba(108,237,164,0.12);color:#9ef0c3}
+.status.pending{background:rgba(255,197,125,0.12);color:#ffd9a8}
+.dots{text-align:right;color:var(--muted)}
+
+/* Modal */
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,0.6);visibility:hidden;opacity:0;transition:all .2s;z-index:1000;padding:20px}
+.modal[aria-hidden="false"]{visibility:visible;opacity:1}
+.modal-panel{background:var(--card);padding:24px;border-radius:16px;width:100%;max-width:400px;box-shadow:var(--shadow)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-header h4{margin:0;font-size:18px}
+.modal-header button{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px}
+.modal-body{padding-top:8px}
+.switch-row{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.switch-row .label{font-weight:500;margin-bottom:4px}
+.switch-row .desc{font-size:13px;color:var(--muted)}
+.switch{position:relative;flex-shrink:0}
+.switch input{display:none}
+.switch .slider{width:48px;height:28px;background:rgba(255,255,255,0.06);border-radius:999px;position:relative;display:inline-block;cursor:pointer}
+.switch .slider:after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:white;top:4px;left:4px;transition:all .2s}
+.switch input:checked + .slider{background:linear-gradient(90deg,#6a5cff,#b48bff)}
+.switch input:checked + .slider:after{transform:translateX(20px)}
+
+/* --- LIGHT THEME SPECIFICS --- */
+body.light .sidebar{background:transparent;border-right:1px solid rgba(16,16,24,0.04)}
+body.light .icon-btn{background:transparent;color:var(--light-text);box-shadow:none}
+body.light .card,
+body.light .chart-card,
+body.light .quick-card,
+body.light .table-card,
+body.light .modal-panel{
+    background:var(--light-panel);
+    box-shadow: 0 8px 24px rgba(14,12,24,0.06);
+}
+body.light .card .card-title,
+body.light .txn-text .sub,
+body.light .table-row.header,
+body.light .card .card-meta{
+    color:var(--light-muted);
+}
+body.light .card-value{color:var(--light-text)}
+body.light .badge.positive{background:#e6f9ee;color:#0a3b1f}
+
+/* Responsive Tablet */
+@media (max-width: 1024px){
+    .analytics{grid-template-columns:1fr;gap:22px}
+    .cards{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+    .topbar{gap:16px}
+    .search-area h1{font-size:28px}
+}
+
+/* Responsive Mobile */
+@media (max-width: 768px){
+    .app{flex-direction:column;padding-bottom:70px}
+    
+    /* Move sidebar to bottom */
+    .sidebar{
+        width:100%;
+        height:70px;
+        flex-direction:row;
+        padding:10px 16px;
+        position:fixed;
+        bottom:0;
+        left:0;
+        right:0;
+        border-right:none;
+        border-top:1px solid rgba(255,255,255,0.06);
+        background:linear-gradient(180deg, rgba(15,23,36,0.98), rgba(15,23,36,0.95));
+        backdrop-filter:blur(10px);
+        justify-content:space-between;
+    }
+    
+    body.light .sidebar{
+        background:rgba(255,255,255,0.95);
+        backdrop-filter:blur(10px);
+        border-top:1px solid rgba(16,16,24,0.08);
+    }
+    
+    .brand{display:none}
+    .nav-icons{flex-direction:row;gap:8px;overflow-x:auto}
+    .sidebar-bottom{margin-top:0;margin-left:auto}
+    .icon-btn{width:48px;height:48px}
+    .icon-btn:hover{transform:translateY(0)}
+    
+    /* Main content adjustments */
+    .main{padding:16px;padding-bottom:90px}
+    
+    /* Topbar mobile */
+    .topbar{flex-direction:column;align-items:stretch;gap:12px}
+    .search-area h1{font-size:24px}
+    .top-controls{flex-direction:column;width:100%}
+    .search-input{width:100%}
+    .search-input input{min-width:100%;width:100%}
+    .profile{width:100%;justify-content:space-between}
+    
+    /* Cards mobile */
+    .cards{grid-template-columns:1fr;gap:16px}
+    .card.big{grid-column:span 1}
+    
+    /* Analytics mobile */
+    .analytics{grid-template-columns:1fr;gap:16px}
+    .chart-card{min-height:300px}
+    
+    /* Table mobile */
+    .table-row{grid-template-columns:1.5fr 1fr 1fr 1.5fr;padding:12px;font-size:13px;min-width:500px}
+    .table-row.header{font-size:11px}
+}
+
+@media (max-width: 480px){
+    .main{padding:12px;padding-bottom:90px}
+    .search-area h1{font-size:20px}
+    .card{padding:16px}
+    .card-value{font-size:24px}
+    .modal-panel{padding:20px;margin:10px}
+    .table-row{padding:10px;font-size:12px}
+    .action{padding:12px 14px;font-size:13px}
+    .icon-btn{width:44px;height:44px}
+    .icon-btn svg{width:20px;height:20px}
+}
+
+
+
+ /* ---------- Overall Progress Modal ---------- */
+.modal--progress {backdrop-filter:blur(0); transition:backdrop-filter .25s;}
+body.modal-open .app{filter:blur(6px); transition:filter .25s;}
+
+.modal-panel.progress{
+   width:100%; max-width:560px; background:var(--card);
+   border-radius:20px; padding:28px; box-shadow:var(--shadow);
+   animation:fadeSlide .3s ease-out;
+}
+.modal-panel.progress .sub{margin:4px 0 18px 0; font-size:14px; color:var(--muted);}
+
+.snapshots{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin:22px 0;}
+.snap{display:flex; align-items:center; gap:10px; font-size:14px;}
+.snap .icon{display:inline-flex; width:34px; height:34px; justify-content:center;
+            align-items:center; border-radius:10px; font-size:18px;}
+.icon.amber{background:linear-gradient(90deg,#f59e0b,#fb923c); color:#fff;}
+.icon.violet{background:linear-gradient(90deg,#a855f7,#c084fc); color:#fff;}
+.icon.blue{background:linear-gradient(90deg,#3b82f6,#60a5fa); color:#fff;}
+.icon.green{background:linear-gradient(90deg,#16a34a,#4ade80); color:#fff;}
+
+.insights{list-style:none; padding-left:18px; margin:0; font-size:14px; line-height:1.6;}
+.insights li{position:relative; margin-bottom:4px;}
+.insights li::before{content:'•'; position:absolute; left:-12px; color:var(--accent);}
+
+@keyframes fadeSlide{
+  0% {opacity:0; transform:translateY(20px);}
+  100%{opacity:1; transform:translateY(0);}
+}
+
+/* light-mode tweaks */
+body.light .modal-panel.progress{background:var(--light-panel);}
+body.light .modal--progress{background:rgba(0,0,0,0.15);}
+
+/* Detail Modal specific */
+.modal-panel.detail {
+  width: 100%; max-width: 600px;
+  max-height: 85vh; display: flex; flex-direction: column;
+}
+.detail-content {
+  overflow-y: auto; padding-right: 8px; margin-top: 10px;
+}
+.qa-item {
+  background: rgba(255,255,255,0.03);
+  border-radius: 12px; padding: 16px; margin-bottom: 12px;
+}
+body.light .qa-item { background: rgba(0,0,0,0.03); }
+.qa-q { font-weight: 600; margin-bottom: 6px; color: var(--text); }
+body.light .qa-q { color: var(--light-text); }
+.qa-a { color: var(--muted); font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.qa-a .val-badge { 
+  background: rgba(106,92,255,0.15); color: #8b7aff; 
+  padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; 
+}
+  </style>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="logo">SP</div>
+      </div>
+
+      <nav class="nav-icons">
+        <a href="#"><button class="icon-btn active" title="Dashboard" data-role="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M3 10.5L12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button></a>
+
+        <a href="#history"><button class="icon-btn" title="Stress History" data-role="history">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M4 4h16v16H4V4z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 9h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button></a>
+
+        <a href="#">
+          <button class="icon-btn" title="Coping Strategies" data-role="coping">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </button>
+        </a>
+
+        <button class="icon-btn" title="Settings" id="settingsBtn">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <button class="icon-btn logout" id="logoutBtn" title="Logout">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M16 17l5-5-5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M21 12H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 19H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main">
+      <!-- Header -->
+      <header class="topbar">
+        <div class="search-area">
+          <h1>Good morning, <span class="username">Alex</span> ✨</h1>
+          <p class="subtitle">Your weekly stress overview</p>
+        </div>
+
+        <div class="top-controls">
+           <!-- Cleaned up as requested -->
+        </div>
+      </header>
+
+      <!-- Top Summary Cards -->
+      <section class="cards">
+        <div class="card">
+          <div class="card-icon blue">💓</div>
+          <div class="card-content">
+            <div class="card-title">Overall Stress</div>
+            <div class="card-value" id="overallStressVal">--</div>
+            <div class="card-meta">High</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-icon green">📱</div>
+          <div class="card-content">
+            <div class="card-title">Mobile Stress</div>
+            <div class="card-value" id="mobileStressVal">--</div>
+            <div class="card-meta">Medium</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-icon amber">💼</div>
+          <div class="card-content">
+            <div class="card-title">Workload Stress</div>
+            <div class="card-value" id="workloadStressVal">--</div>
+            <div class="card-meta">High</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-icon violet">💵</div>
+          <div class="card-content">
+            <div class="card-title">Financial Stress</div>
+            <div class="card-value" id="financialStressVal">--</div>
+            <div class="card-meta">Low</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Middle Section: Chart + Quick Actions -->
+      <section class="analytics">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Stress Trend (Last 7 Days)</h3>
+          </div>
+          <canvas id="stressChart" width="600" height="240"></canvas>
+        </div>
+
+        <aside class="quick-card">
+          <h3>Quick Actions</h3>
+          <a href="/prediction-form"><button class="action primary">🔄 Calculate Stress</button></a>
+          <button class="action" id="openProgressBtn">📊 View Overall Progress</button>
+          <a href="/coping-strategies" style="text-decoration:none;"><button class="action">💡 Coping Suggestions</button></a>
+        </aside>
+      </section>
+
+      <!-- Bottom Section: Recent History -->
+      <section class="recent" id="history">
+        <div class="recent-header">
+          <h3>Recent History</h3>
+        </div>
+
+        <div class="table-card">
+          <div class="table-row header">
+            <div>Date</div>
+            <div>Category</div>
+            <div>Stress Score</div>
+            <div>Suggestion</div>
+          </div>
+
+          <div class="table-row">
+            <div class="txn-text">2025-10-17</div>
+            <div class="txn-text">Workload</div>
+            <div class="amount">80%</div>
+            <div class="txn-text">Take short breaks</div>
+          </div>
+          <div class="table-row">
+            <div class="txn-text">2025-10-16</div>
+            <div class="txn-text">Mobile</div>
+            <div class="amount">60%</div>
+            <div class="txn-text">Limit phone usage</div>
+          </div>
+          <div class="table-row">
+            <div class="txn-text">2025-10-15</div>
+            <div class="txn-text">Financial</div>
+            <div class="amount">45%</div>
+            <div class="txn-text">Review budget</div>
+          </div>
+        </div>
+      </section>
+
+            
+
+    </main>
+  </div>
+
+  <!-- Settings Modal -->
+ <div id="settingsModal" class="modal" aria-hidden="true">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h4>Settings</h4>
+        <button id="closeSettings">✕</button>
+      </div>
+      <div class="modal-body">
+        <label class="switch-row">
+          <div>
+            <div class="label">Light Theme</div>
+            <div class="desc">Enable light theme (accent: dark purple)</div>
+          </div>
+          <div class="switch">
+            <input type="checkbox" id="themeToggle">
+            <span class="slider"></span>
+          </div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+
+     <!-- 🔥 Overall Progress Modal -->
+            <div id="progressModal" class="modal modal--progress" aria-hidden="true">
+            <div class="modal-panel progress">
+                <header class="modal-header">
+                <div>
+                    <h3>Overall Stress Progress</h3>
+                    <p class="sub">Here’s a detailed view of your overall stress trend.</p>
+                </div>
+                <button id="closeProgress" aria-label="Close">✕</button>
+                </header>
+
+                <!-- Line Chart -->
+                <canvas id="progressChart" height="220"></canvas>
+
+                <!-- Category snapshots -->
+                <div class="snapshots">
+                <div class="snap"><span class="icon amber">💼</span><div>Workload <b>35%</b></div></div>
+                <div class="snap"><span class="icon violet">💵</span><div>Financial <b>18%</b></div></div>
+                <div class="snap"><span class="icon blue">📚</span><div>Study <b>22%</b></div></div>
+                <div class="snap"><span class="icon green">📱</span><div>Mobile <b>25%</b></div></div>
+                </div>
+
+                <!-- Insights -->
+                <ul class="insights">
+                <li>👍 You improved <b>20 %</b> this week.</li>
+                <li>📈 Mobile stress drops after 9 PM.</li>
+                <li>🧘 Meditation linked to 12 % fall.</li>
+                </ul>
+            </div>
+            </div>
+
+    <!-- 🔥 Prediction Detail Modal -->
+    <div id="detailModal" class="modal" aria-hidden="true">
+      <div class="modal-panel detail">
+        <header class="modal-header">
+           <div>
+             <h3>Prediction Details</h3>
+             <p class="sub" id="detailDate">Date: --</p>
+           </div>
+           <button id="closeDetail" aria-label="Close">✕</button>
+        </header>
+        <div class="modal-body detail-content" id="detailBody">
+           <!-- Q&A inserted here -->
+        </div>
+      </div>
+    </div>
+
+  <script>
+
+     (() => {
+  // --- Elements ---
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsModal = document.getElementById('settingsModal');
+  const closeSettings = document.getElementById('closeSettings');
+  const themeToggle = document.getElementById('themeToggle');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  // --- Open Settings Modal ---
+  settingsBtn.addEventListener('click', () => {
+    settingsModal.setAttribute('aria-hidden', 'false');
+  });
+
+  // --- Close Settings Modal ---
+  closeSettings.addEventListener('click', () => {
+    settingsModal.setAttribute('aria-hidden', 'true');
+  });
+
+  settingsModal.addEventListener('click', (e) => {
+    if (e.target === settingsModal) settingsModal.setAttribute('aria-hidden', 'true');
+  });
+
+  // --- Theme Toggle ---
+  const applyTheme = (isLight) => {
+    if (isLight) {
+      document.body.classList.add('light');
+      localStorage.setItem('dashboard-theme', 'light');
+      themeToggle.checked = true;
+    } else {
+      document.body.classList.remove('light');
+      localStorage.setItem('dashboard-theme', 'dark');
+      themeToggle.checked = false;
+    }
+  };
+
+  // Load saved theme
+  const saved = localStorage.getItem('dashboard-theme');
+  applyTheme(saved === 'light');
+
+  themeToggle.addEventListener('change', (e) => applyTheme(e.target.checked));
+
+    // --- Logout Button ---
+    logoutBtn.addEventListener('click', async () => {
+       await fetch('/api/auth/logout', { method: 'POST' });
+       window.location.href = '/login';
+    });
+
+    // --- Fetch User Info ---
+    async function fetchUser() {
+        try {
+            const res = await fetch('/api/user/me');
+            if (res.ok) {
+                const data = await res.json();
+                const userNameEls = document.querySelectorAll('.username');
+                userNameEls.forEach(el => el.textContent = data.username);
+                // Also update profile name if exists
+                const profileName = document.querySelector('.profile-info .name');
+                if(profileName) profileName.textContent = data.username;
+            } else {
+                // If not logged in, redirect to login
+                window.location.href = '/login';
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+    
+    fetchUser();
+
+    // --- Stress Trend Chart ---
+    const ctx = document.getElementById('stressChart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0,0,0,240);
+    gradient.addColorStop(0, 'rgba(124,58,237,0.18)');
+    gradient.addColorStop(1, 'rgba(124,58,237,0.02)');
+
+    let stressChart = null;
+
+    function renderStressChart(labels, data) {
+      if (stressChart) {
+        stressChart.data.labels = labels;
+        stressChart.data.datasets[0].data = data;
+        stressChart.update();
+        return;
+      }
+      const gradient = ctx.createLinearGradient(0,0,0,240);
+      gradient.addColorStop(0, 'rgba(124,58,237,0.18)');
+      gradient.addColorStop(1, 'rgba(124,58,237,0.02)');
+      stressChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Stress Score',
+            data: data,
+            fill: true,
+            backgroundColor: gradient,
+            borderColor: '#7c5cff',
+            tension: 0.35,
+            pointRadius: 3
+          }]
+        },
+        options: {
+          plugins: {legend:{display:false}},
+          scales: {
+            x: { grid:{display:false}, ticks:{color: getComputedStyle(document.body).getPropertyValue('--muted') || '#9aa4b2'}},
+            y: { grid:{color:'rgba(255,255,255,0.03)'}, ticks:{color: getComputedStyle(document.body).getPropertyValue('--muted') || '#9aa4b2'}} 
+          }
+        }
+      });
+    }
+
+// --- Simplified Question Sets for Mapping ---
+    // (Copy of structure from prediction-form.html, text only needed)
+    const questionsMap = {
+      kids: [
+        "What is your gender?", "Have you recently experienced stress in your life?",
+        "Have you noticed a rapid heartbeat or palpitations?", "Have you been dealing with general anxiety or tension recently?",
+        "Do you face any sleep problems or difficulties falling asleep?", "Does anxiety or tension keep you awake or disturb your sleep?",
+        "Have you been getting headaches more often than usual?", "Do you get irritated easily?",
+        "Do you have trouble concentrating on your academic tasks?", "Have you been feeling sadness or low mood?",
+        "Have you been experiencing any illness or health issues?", "Do you often feel lonely or isolated?",
+        "Do you feel overwhelmed with your academic workload?", "Are you in competition with your peers, and does it affect you?",
+        "Do you find that your relationship often causes you stress?", "Are you facing any difficulties with your professors or instructors?",
+        "Is your working environment unpleasant or stressful?", "Do you struggle to find time for relaxation and leisure activities?",
+        "Is your hostel or home environment causing you difficulties?", "Do you lack confidence in your academic performance?",
+        "Do you lack confidence in your choice of academic subjects?", "Are your academic and extracurricular activities conflicting for you?",
+        "Do you attend classes regularly?", "Have you gained/lost weight (in a way that concerns you)?"
+      ],
+      seniors: [ // 18 questions in HTML
+        "What is your gender?", "What is your Occupation?", "What is your current marital status?",
+        "How many hours of sleep do you get on average per night?", "How would you rate your typical sleep quality?",
+        "On a scale of 1-5, how physically active are you?", "On average, how many hours per day do you spend on screens?",
+        "How many cups of caffeinated beverages do you consume?", "How many standard units of alcohol do you consume per week?",
+        "Do you currently smoke?", "How many hours do you typically work per day?",
+        "How many hours per day do you spend commuting?", "On a scale of 1-5, how frequent and meaningful are your social interactions?",
+        "Do you regularly practice meditation or mindfulness?", "What is your primary type of exercise?",
+        "What is your most recent Blood Pressure reading?", "What is your most recent Total Cholesterol Level?",
+        "What is your most recent Fasting Blood Sugar Level?"
+      ]
+    };
+
+    /* ------------ Detail Modal Logic ------------- */
+    const detailModal = document.getElementById('detailModal');
+    const closeDetail = document.getElementById('closeDetail');
+    const detailBody = document.getElementById('detailBody');
+    const detailDate = document.getElementById('detailDate');
+
+    closeDetail.addEventListener('click', () => detailModal.setAttribute('aria-hidden', 'true'));
+
+    window.viewPrediction = function(index) {
+        // We need the data. It's in 'globalHistory' if we store it, 
+        // or we fetch again. Let's create a global var to store fetched history.
+        if(!window.globalHistory || !window.globalHistory[index]) return;
+        
+        const item = window.globalHistory[index];
+        const answers = JSON.parse(item.answers || '[]');
+        const d = new Date(item.createdAt);
+        detailDate.textContent = 'Date: ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+
+        // Infer set
+        let qSet = [];
+        if(answers.length >= 20) qSet = questionsMap.kids;
+        else qSet = questionsMap.seniors;
+
+        detailBody.innerHTML = qSet.map((q, i) => {
+             const ansVal = answers[i] !== undefined ? answers[i] : 'N/A';
+             return `
+               <div class="qa-item">
+                  <div class="qa-q">${i+1}. ${q}</div>
+                  <div class="qa-a">Answer Value: <span class="val-badge">${ansVal}</span></div>
+               </div>
+             `;
+        }).join('');
+
+        // Show modal
+        detailModal.setAttribute('aria-hidden', 'false');
+    };
+    
+    // --- Update loadHistoryAndRender to populate Top Cards and Global History ---
+    async function loadHistoryAndRender() {
+      try {
+        const res = await fetch('/api/history'); 
+        if (!res.ok) throw new Error('HTTP '+res.status);
+        const history = await res.json();
+        
+        // Store globally for detail view
+        window.globalHistory = history;
+
+        // 1. Populate Top Cards (Dynamic)
+        if(history.length > 0) {
+            let latest = history[0]; // Newest (desc)
+            // or we might want averages? 'Overall Stress' usually implies current/latest state or average.
+            // Let's show Latest for 'Overall' and Averages for others like the modal does.
+            
+           document.getElementById('overallStressVal').textContent = Math.round(latest.score) + '%';
+
+           // Calculate stats (same logic as modal)
+           let stats = { workload:0, financial:0, mobile:0, count:0 };
+           history.forEach(h => {
+             try {
+                let ans = JSON.parse(h.answers||'[]');
+                if(ans.length>0){
+                   stats.count++;
+                   let workVal = ans.length>20 ? (ans[13]||0) : (ans[10]||0);
+                   stats.workload += (workVal/5)*100;
+                   let mobVal = ans.length<=20 ? (ans[6]||0) : (ans[5]||0);
+                   stats.mobile += (mobVal/(ans.length<=20?7:5))*100;
+                   let finVal = ans.length>20 ? (ans[4]||0) : (ans[16]||0);
+                   stats.financial += (finVal/5)*100;
+                }
+             } catch(e){}
+           });
+           
+           if(stats.count>0){
+              document.getElementById('workloadStressVal').textContent = Math.round(stats.workload/stats.count) + '%';
+              document.getElementById('mobileStressVal').textContent = Math.round(stats.mobile/stats.count) + '%';
+              document.getElementById('financialStressVal').textContent = Math.round(stats.financial/stats.count) + '%';
+           }
+        }
+
+        if (!Array.isArray(history) || history.length === 0) {
+          renderStressChart([], []);
+          return;
+        }
+
+        // Chart Data (Oldest -> Newest)
+        const forChart = [...history].reverse(); 
+        const labels = forChart.map(r => {
+          const d = new Date(r.createdAt || '');
+          return (!isNaN(d.getTime())) ? d.toISOString().slice(5,10) : '';
+        });
+        const scores = forChart.map(r => Number(r.score || 0));
+        renderStressChart(labels, scores);
+
+        // Recent History Table
+        const historyContainer = document.querySelector('.table-card');
+        if (historyContainer) {
+             historyContainer.innerHTML = `<div class="table-row header"><div>Date</div><div>Label</div><div>Score</div><div>Details</div></div>` +
+                history.slice(0, 10).map((r, idx) => {
+                  const d = new Date(r.createdAt || '');
+                  const dateStr = (!isNaN(d.getTime())) ? d.toLocaleDateString() : '';
+                  return `<div class="table-row">
+                            <div class="txn-text">${dateStr}</div>
+                            <div class="txn-text">${r.label||''}</div>
+                            <div class="amount" style="color:${getColorForScore(r.score)}">${Math.round(r.score||0)}%</div>
+                            <div class="txn-text">
+                               <button class="action" style="padding:6px 12px; font-size:12px;" onclick="viewPrediction(${idx})">View</button>
+                            </div>
+                          </div>`;
+                }).join('');
+        }
+
+      } catch (err) {
+        console.error('Could not load history:', err);
+      }
+    }
+    
+    function getColorForScore(s){
+        if(s<33) return '#10b981';
+        if(s<66) return '#f59e0b';
+        return '#ef4444';
+    }
+    
+    // call loader on DOM ready
+    loadHistoryAndRender();
+
+/* ------------ Overall Progress Modal ------------- */
+const progressBtn   = document.getElementById('openProgressBtn');
+const progressModal = document.getElementById('progressModal');
+const closeProgress = document.getElementById('closeProgress');
+let progressChart;
+
+progressBtn.addEventListener('click', openProgress);
+closeProgress.addEventListener('click', closeProgressModal);
+progressModal.addEventListener('click', e=>{
+   if(e.target===progressModal) closeProgressModal();      // backdrop click
+});
+document.addEventListener('keydown',e=>{
+   if(e.key==='Escape') closeProgressModal();
+});
+
+function openProgress(){
+   progressModal.setAttribute('aria-hidden','false');
+   document.body.classList.add('modal-open');
+
+   // Fetch data dynamically
+   fetch('/api/history')
+     .then(res => res.json())
+     .then(history => {
+        // 1. Process Data for Chart (Last 7 entries, reversed for functionality)
+        // History is Newest -> Oldest. We want the last 7 entries.
+        const recent = history.slice(0, 7).reverse(); // Now Oldest -> Newest
+
+        const labels = recent.map(item => {
+            const d = new Date(item.createdAt);
+            const today = new Date();
+            const diffTime = Math.abs(today - d);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0 && today.getDate() === d.getDate()) return 'Today';
+            if (diffDays === 1) return 'Yesterday';
+            return d.toLocaleDateString('en-US', { weekday: 'short' });
+        });
+
+        const dataPoints = recent.map(item => item.score);
+
+        // 2. Calculate Category Averages
+        // Heuristics based on question indices
+        let stats = { workload:0, financial:0, study:0, mobile:0, count:0 };
+        
+        history.forEach(h => {
+            try {
+                // Parse answers string [1, 2, 3...]
+                let ans = JSON.parse(h.answers || '[]');
+                if(ans.length > 0) {
+                   stats.count++;
+                   // Normalize all to 0-100 scale (val/5 * 100)
+                   // Workload: Kids Q13 (idx 13), Seniors Q10 (idx 10)
+                   let workVal = ans.length > 20 ? (ans[13]||0) : (ans[10]||0);
+                   stats.workload += (workVal/5)*100;
+
+                   // Study: Kids Q9 (idx 9), Seniors (Map to work or 0)
+                   let studyVal = ans.length > 20 ? (ans[9]||0) : 0;
+                   stats.study += (studyVal/5)*100;
+
+                   // Mobile: Seniors Q6 (idx 6), Kids (Map to Q5 sleep or 0)
+                   let mobVal = ans.length <= 20 ? (ans[6]||0) : (ans[5]||0);
+                   stats.mobile += (mobVal/maxValForMobile(ans.length))*100; 
+
+                   // Financial: No direct Q. Map to 'General' (Kids Q4 idx 4) or 'Cholesterol' (Seniors Q16 idx 16) as proxy
+                   let finVal = ans.length > 20 ? (ans[4]||0) : (ans[16]||0);
+                   stats.financial += (finVal/5)*100;
+                }
+            } catch(e){}
+        });
+
+        function maxValForMobile(len) { return len <= 20 ? 7 : 5; } // Senior Q6 max is 7, Kids Q5 max is 5
+
+        const avgs = {
+            workload: stats.count ? Math.round(stats.workload / stats.count) : 0,
+            financial: stats.count ? Math.round(stats.financial / stats.count) : 0,
+            study: stats.count ? Math.round(stats.study / stats.count) : 0,
+            mobile: stats.count ? Math.round(stats.mobile / stats.count) : 0
+        };
+
+        // Update DOM Snapshots
+        const snapContainer = document.querySelector('.snapshots');
+        if(snapContainer) {
+            snapContainer.innerHTML = `
+                <div class="snap"><span class="icon amber">💼</span><div>Workload <b>${avgs.workload}%</b></div></div>
+                <div class="snap"><span class="icon violet">💵</span><div>Financial <b>${avgs.financial}%</b></div></div>
+                <div class="snap"><span class="icon blue">📚</span><div>Study <b>${avgs.study}%</b></div></div>
+                <div class="snap"><span class="icon green">📱</span><div>Mobile <b>${avgs.mobile}%</b></div></div>
+            `;
+        }
+        
+        // Update Insights
+        const insightsList = document.querySelector('.insights');
+        if(insightsList) {
+             const currentScore = dataPoints[dataPoints.length-1] || 0;
+             const prevScore = dataPoints[dataPoints.length-2] || currentScore;
+             const diff = Math.round(currentScore - prevScore);
+             const trend = diff > 0 ? `Stress increased by ${diff}% since last check.` : `You improved ${Math.abs(diff)}% since last check.`;
+             
+             insightsList.innerHTML = `
+                <li>${diff <= 0 ? '👍' : '⚠️'} ${trend}</li>
+                <li>📈 Mobile stress average: ${avgs.mobile}%</li>
+                <li>🧘 Workload average: ${avgs.workload}%</li>
+             `;
+        }
+
+        // Render Chart
+        if(progressChart){
+             progressChart.data.labels = labels;
+             progressChart.data.datasets[0].data = dataPoints;
+             progressChart.update();
+        } else {
+             const ctx = document.getElementById('progressChart').getContext('2d');
+             const grad = ctx.createLinearGradient(0,0,0,220);
+             grad.addColorStop(0,'rgba(106,92,255,0.18)');
+             grad.addColorStop(1,'rgba(106,92,255,0.02)');
+        
+             progressChart = new Chart(ctx,{
+                type:'line',
+                data:{
+                  labels: labels,
+                  datasets:[{
+                     data: dataPoints,
+                     borderColor:'#6a5cff', backgroundColor:grad,
+                     fill:true, tension:.35, pointRadius:4
+                  }]
+                },
+                options:{
+                  plugins:{legend:{display:false}},
+                  scales:{
+                    x:{grid:{display:false}, ticks:{color:'#9aa4b2'}},
+                    y:{grid:{color:'rgba(255,255,255,0.05)'}, min:0, max:100, ticks:{color:'#9aa4b2'}}
+                  }
+                }
+             });
+        }
+     })
+     .catch(err => console.error("Failed to load progress data", err));
+}
+
+function closeProgressModal(){
+   progressModal.setAttribute('aria-hidden','true');
+   document.body.classList.remove('modal-open');
+}
+
+})();
+  </script>
+
+
+
+</body>
+</html>
